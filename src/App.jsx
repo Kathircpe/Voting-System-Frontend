@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import './App.css'
-import Home from './component/Home.jsx'
+import Home from './component/home/Home.jsx'
 import Login from './component/auth/login/login.jsx'
 import Signup from './component/auth/signup/Signup.jsx'
 import ForgotPassword from './component/auth/forgotPassword/forgotPassword.jsx'
@@ -14,6 +14,7 @@ function App() {
   return(
     <BrowserRouter>
     <Routes>
+      
       <Route path="/voter" element={<Voter />} />
 
       <Route path="/" element={<Home />} />

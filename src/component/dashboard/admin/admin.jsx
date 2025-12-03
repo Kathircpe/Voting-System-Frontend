@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import styles from './admin.module.css';
 
 const Admin = () => {
+  if(!localStorage.token||localStorage.user.id!=1){
+    window.location.href='/login';
+  }
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openMenuSection, setOpenMenuSection] = useState('main');

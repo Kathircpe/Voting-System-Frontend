@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './voter.module.css';
 
-const VoterDashboard = () => {
+const Voter = () => {
+  if(!localStorage.token){
+    window.location.href='/login';
+  }
   const [currentSection, setCurrentSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -10,8 +13,9 @@ const VoterDashboard = () => {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : { 
       name: 'Guest', 
-      // id: 'N/A',
-      email: 'N/A' 
+      id: 'N/A',
+      email: 'N/A', 
+      phoneNumber: 'N/A'
     };
   });
 
@@ -25,6 +29,9 @@ const VoterDashboard = () => {
 
   // Profile State
   const [voterDetails, setVoterDetails] = useState(null);
+
+// Elections State (put near Candidates State)
+const [elections, setElections] = useState([]);
 
   // Candidates State
   const [candidates, setCandidates] = useState([]);
@@ -52,7 +59,7 @@ const VoterDashboard = () => {
   const [updateMessage, setUpdateMessage] = useState(null);
 
   // API Configuration
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1/voter';
+  const API_BASE_URL = 'https://voting-system-aztp.onrender.com/api/v1/voter';
   const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
@@ -67,6 +74,12 @@ const VoterDashboard = () => {
       const response = await api.get(`/voters/${voterId}`);
       return response.data;
     },
+// In apiCalls object, add:
+getAllElections: async () => {
+  const response = await api.get('/elections');
+  return response.data;
+},
+
     getAllCandidates: async () => {
       const response = await api.get('/candidates');
       return response.data;
@@ -84,6 +97,11 @@ const VoterDashboard = () => {
       return response.data;
     }
   };
+useEffect(() => {
+  if (currentSection === 'elections') {
+    loadElections();
+  }
+}, [currentSection]);
 
   // Load candidates on mount
   useEffect(() => {
@@ -109,6 +127,18 @@ const VoterDashboard = () => {
       setLoading(false);
     }
   };
+
+const loadElections = async () => {
+  try {
+    setLoading(true);
+    const data = await apiCalls.getAllElections();
+    setElections(data.content || data);
+  } catch (error) {
+    console.error('Error fetching elections:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const loadCandidates = async () => {
     try {
@@ -213,7 +243,7 @@ const VoterDashboard = () => {
 
   return (
     <div className={styles.layout}>
-      {/* Mobile Toggle */}
+      
       <button 
         className={styles.mobileToggle}
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -231,7 +261,7 @@ const VoterDashboard = () => {
         <div className={styles.userProfile}>
           <div className={styles.userAvatar}>👤</div>
           <div className={styles.userName}>{user.name}</div>
-          <div className={styles.userId}>Voter ID: {user.voterId}</div>
+          <div className={styles.userId}>Voter ID: {user.id}</div>
         </div>
 
         <div className={styles.navSection}>
@@ -248,12 +278,12 @@ const VoterDashboard = () => {
         <div className={styles.navSection}>
           <div className={styles.navTitle}>Actions</div>
           <button
-            className={`${styles.navItem} ${currentSection === 'profile' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection('profile')}
-          >
-            <span>👤</span>
-            <span>My Profile</span>
-          </button>
+    className={`${styles.navItem} ${currentSection === 'myProfile' ? styles.navItemActive : ''}`}
+    onClick={() => setCurrentSection('myProfile')}
+  >
+    <span>👤</span>
+    <span>My Profile</span>
+  </button>
           <button
             className={`${styles.navItem} ${currentSection === 'candidates' ? styles.navItemActive : ''}`}
             onClick={() => setCurrentSection('candidates')}
@@ -261,6 +291,14 @@ const VoterDashboard = () => {
             <span>👥</span>
             <span>View Candidates</span>
           </button>
+          <button
+  className={`${styles.navItem} ${currentSection === 'elections' ? styles.navItemActive : ''}`}
+  onClick={() => setCurrentSection('elections')}
+>
+  <span>🗂️</span>
+  <span>View Elections</span>
+</button>
+
           <button
             className={`${styles.navItem} ${currentSection === 'vote' ? styles.navItemActive : ''}`}
             onClick={() => setCurrentSection('vote')}
@@ -275,6 +313,13 @@ const VoterDashboard = () => {
             <span>📈</span>
             <span>Vote Results</span>
           </button>
+          <button
+    className={`${styles.navItem} ${currentSection === 'searchVoter' ? styles.navItemActive : ''}`}
+    onClick={() => setCurrentSection('searchVoter')}
+  >
+    <span>🔍</span>
+    <span>Search Voter</span>
+  </button>
           <button
             className={`${styles.navItem} ${currentSection === 'update' ? styles.navItemActive : ''}`}
             onClick={() => setCurrentSection('update')}
@@ -386,79 +431,166 @@ const VoterDashboard = () => {
           </div>
         )}
 
-        {/* Profile Section */}
-        {currentSection === 'profile' && (
+       {/* My Profile Section - Local Storage Data */}
+{currentSection === 'myProfile' && (
+  <div>
+    <div className={styles.pageHeader}>
+      <div>
+        <h1 className={styles.pageTitle}>My Profile</h1>
+        <p className={styles.pageSubtitle}>Your voter information</p>
+      </div>
+    </div>
+
+    <div className={styles.infoCard}>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Voter ID</span>
+        <span className={styles.infoValue}>{user.voterId || user.id}</span>
+      </div>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Name</span>
+        <span className={styles.infoValue}>{user.name}</span>
+      </div>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Email</span>
+        <span className={styles.infoValue}>{user.email}</span>
+      </div>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Phone</span>
+        <span className={styles.infoValue}>{user.phoneNumber}</span>
+      </div>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Account Status</span>
+        <span className={`${styles.badge} ${styles.badgeSuccess}`}>Active</span>
+      </div>
+      <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
+        <span className={styles.infoLabel}>Last Login</span>
+        <span className={styles.infoValue}>{new Date().toLocaleDateString()}</span>
+      </div>
+    </div>
+
+    <div className={styles.sectionCard}>
+      <h2 className={styles.sectionTitle}>
+        <span>✏️</span>
+        Quick Actions
+      </h2>
+      <div className={styles.actionGrid}>
+        <div className={styles.actionCard} onClick={() => setCurrentSection('update')}>
+          <div className={styles.actionIcon}>🔧</div>
           <div>
-            <h1 className={styles.pageTitle}>My Profile</h1>
-            <p className={styles.pageSubtitle}>View your voter details</p>
+            <div className={styles.actionTitle}>Update Profile</div>
+            <div className={styles.actionDescription}>Modify your details</div>
+          </div>
+        </div>
+        <div className={styles.actionCard} onClick={() => setCurrentSection('searchVoter')}>
+          <div className={styles.actionIcon}>🔍</div>
+          <div>
+            <div className={styles.actionTitle}>Search Other Voters</div>
+            <div className={styles.actionDescription}>Find voter by ID</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+{/* Search Voter Section - API Lookup */}
+{currentSection === 'searchVoter' && (
+  <div>
+    <div className={styles.pageHeader}>
+      <div>
+        <h1 className={styles.pageTitle}>Search Voter</h1>
+        <p className={styles.pageSubtitle}>Find voter details by ID</p>
+      </div>
+    </div>
 
-            <div className={styles.inputForm}>
-              <h3 className={styles.formTitle}>
-                <span>👤</span>
-                Voter Details
-              </h3>
+    <div className={styles.inputForm}>
+      <h3 className={styles.formTitle}>
+        <span>🔍</span>
+        Search Voter Details
+      </h3>
 
-              <input
-                type="text"
-                className={styles.inputField}
-                placeholder="Enter your Voter ID"
-                defaultValue={user.voterId}
-                onBlur={(e) => handleGetVoterDetails(e.target.value)}
-              />
+      <input
+        type="text"
+        className={styles.inputField}
+        placeholder="Enter Voter ID to search"
+        onBlur={(e) => handleGetVoterDetails(e.target.value)}
+      />
 
-              <button 
-                className={`${styles.btn} ${styles.btnPrimary}`}
-                onClick={() => handleGetVoterDetails(user.voterId)}
-                disabled={loading}
-              >
-                {loading ? 'Loading...' : '🔍 Get My Details'}
-              </button>
+      <button 
+        className={`${styles.btn} ${styles.btnPrimary}`}
+        onClick={() => handleGetVoterDetails(user.voterId || '')}
+        disabled={loading}
+      >
+        {loading ? 'Searching...' : '🔍 Search Voter'}
+      </button>
+    </div>
+
+    {voterDetails && (
+      <div className={styles.infoCard}>
+        {/* Same voterDetails display as before */}
+        <div className={styles.infoRow}>
+          <span className={styles.infoLabel}>Voter ID</span>
+          <span className={styles.infoValue}>{voterDetails.voterId}</span>
+        </div>
+        {/* ... rest of voterDetails fields ... */}
+      </div>
+    )}
+  </div>
+)}
+
+        {/* Elections Section */}
+{currentSection === 'elections' && (
+  <div>
+    <div className={styles.pageHeader}>
+      <div>
+        <h1 className={styles.pageTitle}>Elections</h1>
+        <p className={styles.pageSubtitle}>View all active and past elections</p>
+      </div>
+      <button 
+        className={`${styles.btn} ${styles.btnPrimary}`}
+        onClick={loadElections}
+        disabled={loading}
+      >
+        {loading ? 'Loading...' : '🔄 Refresh List'}
+      </button>
+    </div>
+
+    {loading ? (
+      <div className={styles.loadingText}>Loading elections...</div>
+    ) : (
+      <div className={styles.electionsGrid}>
+        {elections.map((election, idx) => (
+          <div key={idx} className={styles.electionCard}>
+            <div className={styles.electionHeader}>
+              <div className={styles.electionTitle}>{election.title}</div>
+              <span className={`${styles.badge} ${styles.badgePrimary}`}>
+                {election.status}
+              </span>
             </div>
 
-            {voterDetails && (
-              <div className={styles.infoCard}>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Voter ID</span>
-                  <span className={styles.infoValue}>{voterDetails.voterId}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Full Name</span>
-                  <span className={styles.infoValue}>{voterDetails.name}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Email</span>
-                  <span className={styles.infoValue}>{voterDetails.email}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Phone</span>
-                  <span className={styles.infoValue}>{voterDetails.phone}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Age</span>
-                  <span className={styles.infoValue}>{voterDetails.age} years</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Address</span>
-                  <span className={styles.infoValue}>{voterDetails.address}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Status</span>
-                  <span className={`${styles.badge} ${styles.badgeSuccess}`}>{voterDetails.status}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.infoLabel}>Registered Date</span>
-                  <span className={styles.infoValue}>
-                    {new Date(voterDetails.registeredDate).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
-                  <span className={styles.infoLabel}>Votes Cast</span>
-                  <span className={styles.infoValue}>{voterDetails.votesCast}</span>
-                </div>
+            <div className={styles.electionBody}>
+              <div className={styles.electionMeta}>
+                <span>Contract: {election.contractAddress}</span>
+                <span>Type: {election.type}</span>
               </div>
-            )}
+              <div className={styles.electionDates}>
+                <span>Starts: {new Date(election.startDate).toLocaleString()}</span>
+                <span>Ends: {new Date(election.endDate).toLocaleString()}</span>
+              </div>
+              {election.description && (
+                <p className={styles.electionDescription}>{election.description}</p>
+              )}
+            </div>
           </div>
-        )}
+        ))}
+      </div>
+    )}
+
+    {!loading && elections.length === 0 && (
+      <div className={styles.loadingText}>No elections found</div>
+    )}
+  </div>
+)}
+
 
         {/* Candidates Section */}
         {currentSection === 'candidates' && (
@@ -558,7 +690,7 @@ const VoterDashboard = () => {
                   <option value="">Choose a candidate...</option>
                   {candidates.map((c) => (
                     <option key={c.candidateId} value={c.candidateId}>
-                      {c.name} - {c.party}
+                     {c.id} - {c.name} - {c.party}
                     </option>
                   ))}
                 </select>
@@ -812,4 +944,4 @@ const VoterDashboard = () => {
   );
 };
 
-export default VoterDashboard;
+export default Voter;
