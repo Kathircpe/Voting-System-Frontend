@@ -1,0 +1,239 @@
+<!doctype html>
+<!--
+  - Author: Kathir E.
+  - Animated Login Portal
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>verify - Voting Portal</title>
+  <style>
+    </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-container">ECI</div>
+        <h1>Welcome</h1>
+        <p>verify to access your voting portal</p>
+      </div>
+
+      <!-- Message container for errors/success -->
+      <div id="message" class="message"></div>
+
+      <form id="loginForm" class="login-form" action="/auth/login" method="POST">
+        
+        <!-- Email Input -->
+        <div class="input-group">
+          <div class="input-wrapper">
+            <span class="input-icon">📧</span>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder=" " 
+              required 
+              autocomplete="email"
+            />
+            <label for="email">Email Address</label>
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="input-group">
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder=" " 
+              required 
+              autocomplete="current-password"
+            />
+            <label for="password">otp</label>
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+              <span id="toggleIcon">👁️</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Role Selector -->
+        <div class="input-group">
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <select id="role" name="role" required>
+              <option value="">Select your role</option>
+              <option value="VOTER">Voter</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">
+            <span>✓ Verify Account</span>
+          </button>
+          
+          <a href="signup.html" class="btn btn-secondary">
+            <span>Log In</span>
+          </a>
+
+          <!-- VERIFY ACCOUNT BUTTON - IDENTICAL TO SIGNUP PAGE -->
+          <button type="button" class="btn btn-secondary" id="verifyBtn" onclick="window.location.href='/auth/verify'">
+            <span>Sign Up</span>
+          </button>
+        </div>
+
+        <!-- Links -->
+        <div class="form-links">
+          <a href="/auth/forgot-password" class="form-link">Forgot Password?</a>
+          <a href="/" class="form-link">Back to Home</a>
+        </div>
+      </form>
+
+      <div class="divider">
+        <span>Secure Login</span>
+      </div>
+
+      <div class="login-footer">
+        <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
+        <a href="/help">Need Help?</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Password toggle functionality
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('toggleIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.textContent = '🙈';
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.textContent = '👁️';
+      }
+    }
+
+    // Form validation and submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = this.querySelector('.btn-primary');
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const role = document.getElementById('role').value;
+
+      // Basic validation
+      if (!email || !password || !role) {
+        showMessage('Please fill in all fields', 'error');
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showMessage('Please enter a valid email address', 'error');
+        return;
+      }
+
+      // Password validation (minimum 6 characters)
+      if (password.length < 6) {
+        showMessage('Password must be at least 6 characters', 'error');
+        return;
+      }
+
+      // Add loading state
+      submitBtn.classList.add('loading');
+      submitBtn.querySelector('span').style.opacity = '0';
+
+      // Submit form (uncomment when backend is ready)
+      // this.submit();
+
+      // For demo purposes - simulate API call
+      setTimeout(() => {
+        submitBtn.classList.remove('loading');
+        submitBtn.querySelector('span').style.opacity = '1';
+        showMessage('Login successful! Redirecting...', 'success');
+        
+        // Redirect based on role (uncomment when backend is ready)
+        // setTimeout(() => {
+        //   if (role === 'ADMIN') {
+        //     window.location.href = '/admin/dashboard';
+        //   } else {
+        //     window.location.href = '/voter/dashboard';
+        //   }
+        // }, 1500);
+      }, 2000);
+    });
+
+    // Show message function
+    function showMessage(text, type) {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = text;
+      messageEl.className = `message ${type} show`;
+      
+      setTimeout(() => {
+        messageEl.classList.remove('show');
+      }, 5000);
+    }
+
+    // Auto-hide message on input focus
+    document.querySelectorAll('input, select').forEach(input => {
+      input.addEventListener('focus', () => {
+        const messageEl = document.getElementById('message');
+        if (messageEl.classList.contains('error')) {
+          messageEl.classList.remove('show');
+        }
+      });
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.cssText = `
+          position: absolute;
+          width: ${size}px;
+          height: ${size}px;
+          top: ${y}px;
+          left: ${x}px;
+          background: rgba(255,255,255,0.3);
+          border-radius: 50%;
+          transform: scale(0);
+          animation: ripple 0.6s ease-out;
+          pointer-events: none;
+        `;
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
+      });
+    });
+
+    // Add ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1613 @@
+<!doctype html>
+<!--
+  - Author: Kathir E.
+  - Admin Dashboard - Voting Portal
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Admin Dashboard - Voting Portal</title>
+  <style>   :root{
+      /* New Dark/Emerald Theme */
+      --bg-primary:#0a0e1a;
+      --bg-secondary:#111827;
+      --bg-card:#1a202c;
+      --bg-hover:#252e3f;
+      --accent-1:#10b981; /* emerald */
+      --accent-2:#34d399; /* light emerald */
+      --accent-3:#059669; /* dark emerald */
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --info:#3b82f6;
+      --text-primary:#f9fafb;
+      --text-secondary:#9ca3af;
+      --text-muted:#6b7280;
+      --border-color:rgba(55, 65, 81, 0.5);
+      --shadow-sm:0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md:0 4px 16px rgba(0, 0, 0, 0.4);
+      --shadow-lg:0 8px 24px rgba(0, 0, 0, 0.5);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Reset */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;width:100%}
+    
+    body{
+      background:linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #1a202c 100%);
+      color:var(--text-primary);
+      -webkit-font-smoothing:antialiased;
+      line-height:1.6;
+      overflow-x:hidden;
+    }
+
+    /* Layout */
+    .admin-layout{
+      display:flex;
+      min-height:100vh;
+      width:100%;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      width:280px;
+      background:var(--bg-card);
+      border-right:1px solid var(--border-color);
+      padding:24px 0;
+      position:fixed;
+      height:100vh;
+      left:0;
+      top:0;
+      overflow-y:auto;
+      transition:transform 0.3s ease;
+      z-index:1000;
+      box-shadow:var(--shadow-lg);
+    }
+
+    .sidebar-header{
+      padding:0 24px 24px;
+      border-bottom:1px solid var(--border-color);
+      margin-bottom:24px;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:20px;
+      font-weight:700;
+      color:var(--accent-1);
+    }
+
+    .logo-icon{
+      width:40px;
+      height:40px;
+      background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      box-shadow:0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .nav-section{
+      padding:0 16px;
+      margin-bottom:24px;
+    }
+
+    .nav-title{
+      font-size:11px;
+      font-weight:600;
+      text-transform:uppercase;
+      color:var(--text-muted);
+      padding:8px 12px;
+      letter-spacing:0.5px;
+    }
+
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px 16px;
+      margin:4px 0;
+      border-radius:8px;
+      color:var(--text-secondary);
+      text-decoration:none;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      font-size:14px;
+      font-weight:500;
+    }
+
+    .nav-item:hover{
+      background:var(--bg-hover);
+      color:var(--text-primary);
+    }
+
+    .nav-item.active{
+      background:linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.05));
+      color:var(--accent-1);
+      border-left:3px solid var(--accent-1);
+      padding-left:13px;
+    }
+
+    .nav-icon{
+      font-size:18px;
+    }
+
+    /* Main Content */
+    .main-content{
+      flex:1;
+      margin-left:280px;
+      padding:24px;
+      width:calc(100% - 280px);
+    }
+
+    /* Header */
+    .page-header{
+      background:var(--bg-card);
+      padding:20px 24px;
+      border-radius:12px;
+      margin-bottom:24px;
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--border-color);
+    }
+
+    .page-title{
+      font-size:26px;
+      font-weight:700;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+
+    .page-subtitle{
+      font-size:14px;
+      color:var(--text-muted);
+    }
+
+    /* Section Cards */
+    .section-card{
+      background:var(--bg-card);
+      border-radius:12px;
+      padding:24px;
+      margin-bottom:24px;
+      border:1px solid var(--border-color);
+      box-shadow:var(--shadow-sm);
+      transition:all 0.3s ease;
+    }
+
+    .section-card:hover{
+      box-shadow:var(--shadow-md);
+      transform:translateY(-2px);
+    }
+
+    .section-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+      padding-bottom:16px;
+      border-bottom:1px solid var(--border-color);
+    }
+
+    .section-title{
+      font-size:18px;
+      font-weight:600;
+      color:var(--text-primary);
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .section-icon{
+      font-size:22px;
+    }
+
+    /* Action Grid */
+    .action-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+      gap:16px;
+    }
+
+    /* Action Card */
+    .action-card{
+      background:var(--bg-secondary);
+      border:1px solid var(--border-color);
+      border-radius:10px;
+      padding:20px;
+      transition:all 0.3s ease;
+      cursor:pointer;
+    }
+
+    .action-card:hover{
+      background:var(--bg-hover);
+      border-color:var(--accent-1);
+      box-shadow:0 0 0 3px rgba(16, 185, 129, 0.1);
+      transform:translateY(-3px);
+    }
+
+    .action-card-header{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .action-icon{
+      width:44px;
+      height:44px;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+    }
+
+    .action-icon.create{
+      background:linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.1));
+      color:var(--accent-1);
+    }
+
+    .action-icon.update{
+      background:linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1));
+      color:var(--info);
+    }
+
+    .action-icon.delete{
+      background:linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(248, 113, 113, 0.1));
+      color:var(--danger);
+    }
+
+    .action-icon.view{
+      background:linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1));
+      color:var(--warning);
+    }
+
+    .action-title{
+      font-size:15px;
+      font-weight:600;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+
+    .action-description{
+      font-size:12px;
+      color:var(--text-muted);
+      line-height:1.4;
+    }
+
+    /* Input Form */
+    .input-form{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .form-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .input-group{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .input-label{
+      font-size:13px;
+      font-weight:500;
+      color:var(--text-secondary);
+    }
+
+    .input-field{
+      padding:10px 14px;
+      background:var(--bg-secondary);
+      border:1px solid var(--border-color);
+      border-radius:8px;
+      color:var(--text-primary);
+      font-size:14px;
+      font-family:inherit;
+      transition:all 0.2s ease;
+    }
+
+    .input-field:focus{
+      outline:none;
+      border-color:var(--accent-1);
+      background:var(--bg-card);
+      box-shadow:0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    textarea.input-field{
+      resize:vertical;
+      min-height:80px;
+      font-family:inherit;
+    }
+
+    /* Buttons */
+    .btn{
+      padding:10px 20px;
+      border:none;
+      border-radius:8px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+      font-family:inherit;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color:#fff;
+      box-shadow:0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary:hover{
+      transform:translateY(-2px);
+      box-shadow:0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-secondary{
+      background:var(--bg-secondary);
+      color:var(--text-primary);
+      border:1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover{
+      background:var(--bg-hover);
+      border-color:var(--accent-1);
+    }
+
+    .btn-danger{
+      background:var(--danger);
+      color:#fff;
+      box-shadow:0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover{
+      background:#dc2626;
+      transform:translateY(-2px);
+    }
+
+    .btn-info{
+      background:var(--info);
+      color:#fff;
+      box-shadow:0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-info:hover{
+      background:#2563eb;
+      transform:translateY(-2px);
+    }
+
+    .btn-group{
+      display:flex;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    /* Table */
+    .data-table{
+      width:100%;
+      background:var(--bg-secondary);
+      border-radius:10px;
+      overflow:hidden;
+      border:1px solid var(--border-color);
+      margin-top:16px;
+    }
+
+    .data-table table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    .data-table th{
+      background:var(--bg-card);
+      padding:14px 16px;
+      text-align:left;
+      font-size:12px;
+      font-weight:600;
+      color:var(--text-muted);
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      border-bottom:1px solid var(--border-color);
+    }
+
+    .data-table td{
+      padding:14px 16px;
+      font-size:14px;
+      color:var(--text-secondary);
+      border-bottom:1px solid var(--border-color);
+    }
+
+    .data-table tr:last-child td{
+      border-bottom:none;
+    }
+
+    .data-table tbody tr:hover{
+      background:var(--bg-hover);
+    }
+
+    /* Pagination */
+    .pagination{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin-top:20px;
+    }
+
+    .pagination-btn{
+      padding:8px 14px;
+      background:var(--bg-secondary);
+      border:1px solid var(--border-color);
+      border-radius:6px;
+      color:var(--text-secondary);
+      font-size:13px;
+      cursor:pointer;
+      transition:all 0.2s ease;
+    }
+
+    .pagination-btn:hover{
+      background:var(--bg-hover);
+      color:var(--accent-1);
+      border-color:var(--accent-1);
+    }
+
+    .pagination-btn.active{
+      background:var(--accent-1);
+      color:#fff;
+      border-color:var(--accent-1);
+    }
+
+    /* Stats Cards */
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:16px;
+      margin-bottom:24px;
+    }
+
+    .stat-card{
+      background:var(--bg-card);
+      border:1px solid var(--border-color);
+      border-radius:10px;
+      padding:20px;
+      transition:all 0.3s ease;
+    }
+
+    .stat-card:hover{
+      box-shadow:var(--shadow-md);
+      transform:translateY(-3px);
+    }
+
+    .stat-label{
+      font-size:12px;
+      color:var(--text-muted);
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+
+    .stat-value{
+      font-size:28px;
+      font-weight:700;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+
+    .stat-trend{
+      font-size:12px;
+      color:var(--accent-1);
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    /* Badge */
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      padding:4px 10px;
+      border-radius:6px;
+      font-size:11px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+    }
+
+    .badge-success{
+      background:rgba(16, 185, 129, 0.15);
+      color:var(--accent-1);
+    }
+
+    .badge-warning{
+      background:rgba(245, 158, 11, 0.15);
+      color:var(--warning);
+    }
+
+    .badge-danger{
+      background:rgba(239, 68, 68, 0.15);
+      color:var(--danger);
+    }
+
+    .badge-info{
+      background:rgba(59, 130, 246, 0.15);
+      color:var(--info);
+    }
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle{
+      display:none;
+      position:fixed;
+      top:20px;
+      left:20px;
+      z-index:1001;
+      background:var(--bg-card);
+      border:1px solid var(--border-color);
+      border-radius:8px;
+      padding:10px;
+      cursor:pointer;
+      color:var(--text-primary);
+      font-size:20px;
+    }
+
+    /* Responsive */
+    @media (max-width:1024px){
+      .sidebar{
+        transform:translateX(-100%);
+      }
+
+      .sidebar.active{
+        transform:translateX(0);
+      }
+
+      .main-content{
+        margin-left:0;
+        width:100%;
+      }
+
+      .mobile-menu-toggle{
+        display:block;
+      }
+
+      .action-grid{
+        grid-template-columns:1fr;
+      }
+
+      .form-row{
+        grid-template-columns:1fr;
+      }
+
+      .stats-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:768px){
+      .page-header{
+        padding:16px;
+      }
+
+      .page-title{
+        font-size:20px;
+      }
+
+      .section-card{
+        padding:16px;
+      }
+
+      .main-content{
+        padding:16px;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(10px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    .section-card{
+      animation:fadeIn 0.5s ease;
+    }
+
+    /* Loading state */
+    .btn.loading{
+      pointer-events:none;
+      opacity:0.7;
+      position:relative;
+    }
+
+    .btn.loading::after{
+      content:'';
+      position:absolute;
+      width:16px;
+      height:16px;
+      border:2px solid rgba(255,255,255,0.3);
+      border-top-color:#fff;
+      border-radius:50%;
+      animation:spin 0.8s linear infinite;
+    }
+
+    @keyframes spin{
+      to{transform:rotate(360deg)}
+    }
+
+    /* Hidden class */
+    .hidden{
+      display:none;
+    }
+</style>
+</head>
+<body>
+
+  <!-- Mobile Menu Toggle -->
+  <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+    <span>☰</span>
+  </button>
+
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">⚡</div>
+          <span>Admin</span>
+        </div>
+      </div>
+
+      <nav class="nav-section">
+        <div class="nav-title">Main</div>
+        <a href="#overview" class="nav-item active" onclick="showSection('overview')">
+          <span class="nav-icon">📊</span>
+          <span>Overview</span>
+        </a>
+      </nav>
+
+      <nav class="nav-section">
+        <div class="nav-title">Management</div>
+        <a href="#elections" class="nav-item" onclick="showSection('elections')">
+          <span class="nav-icon">🗳️</span>
+          <span>Elections</span>
+        </a>
+        <a href="#candidates" class="nav-item" onclick="showSection('candidates')">
+          <span class="nav-icon">👤</span>
+          <span>Candidates</span>
+        </a>
+        <a href="#voters" class="nav-item" onclick="showSection('voters')">
+          <span class="nav-icon">👥</span>
+          <span>Voters</span>
+        </a>
+        <a href="#votes" class="nav-item" onclick="showSection('votes')">
+          <span class="nav-icon">📈</span>
+          <span>Vote Results</span>
+        </a>
+      </nav>
+
+      <nav class="nav-section">
+        <div class="nav-title">Account</div>
+        <a href="#settings" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+        <a href="login.html" class="nav-item">
+          <span class="nav-icon">🚪</span>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Overview Section -->
+      <div id="overview-section" class="content-section">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard Overview</h1>
+          <p class="page-subtitle">Welcome back, Admin. Here's what's happening today.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Elections</div>
+            <div class="stat-value">12</div>
+            <div class="stat-trend">↗ +2 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Candidates</div>
+            <div class="stat-value">48</div>
+            <div class="stat-trend">↗ +8 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Registered Voters</div>
+            <div class="stat-value">1,234</div>
+            <div class="stat-trend">↗ +156 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Votes Cast</div>
+            <div class="stat-value">987</div>
+            <div class="stat-trend">↗ +87 today</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Elections Section -->
+      <div id="elections-section" class="content-section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Election Management</h1>
+          <p class="page-subtitle">Create, update, and manage elections</p>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="section-icon">🗳️</span>
+              Elections
+            </h2>
+          </div>
+
+          <div class="action-grid">
+            <!-- Create Election -->
+            <div class="action-card" onclick="showElectionForm('create')">
+              <div class="action-card-header">
+                <div class="action-icon create">➕</div>
+                <div>
+                  <div class="action-title">Create Election</div>
+                  <div class="action-description">Add a new election to the system</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Update Election -->
+            <div class="action-card" onclick="showElectionForm('update')">
+              <div class="action-card-header">
+                <div class="action-icon update">✏️</div>
+                <div>
+                  <div class="action-title">Update Election</div>
+                  <div class="action-description">Modify election details by ID</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Election -->
+            <div class="action-card" onclick="showElectionForm('delete')">
+              <div class="action-card-header">
+                <div class="action-icon delete">🗑️</div>
+                <div>
+                  <div class="action-title">Delete Election</div>
+                  <div class="action-description">Remove election from system</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Election Forms Container -->
+          <div id="election-form-container"></div>
+        </div>
+      </div>
+
+      <!-- Candidates Section -->
+      <div id="candidates-section" class="content-section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Candidate Management</h1>
+          <p class="page-subtitle">Manage candidate profiles and information</p>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="section-icon">👤</span>
+              Candidates
+            </h2>
+          </div>
+
+          <div class="action-grid">
+            <!-- Create Candidate -->
+            <div class="action-card" onclick="showCandidateForm('create')">
+              <div class="action-card-header">
+                <div class="action-icon create">➕</div>
+                <div>
+                  <div class="action-title">Create Candidate</div>
+                  <div class="action-description">Register new candidate</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Update Candidate -->
+            <div class="action-card" onclick="showCandidateForm('update')">
+              <div class="action-card-header">
+                <div class="action-icon update">✏️</div>
+                <div>
+                  <div class="action-title">Update Candidate</div>
+                  <div class="action-description">Edit candidate details by ID</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Candidate -->
+            <div class="action-card" onclick="showCandidateForm('delete')">
+              <div class="action-card-header">
+                <div class="action-icon delete">🗑️</div>
+                <div>
+                  <div class="action-title">Delete Candidate</div>
+                  <div class="action-description">Remove candidate by ID</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Candidate Forms Container -->
+          <div id="candidate-form-container"></div>
+        </div>
+      </div>
+
+      <!-- Voters Section -->
+      <div id="voters-section" class="content-section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Voter Management</h1>
+          <p class="page-subtitle">View and manage registered voters</p>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="section-icon">👥</span>
+              Voters
+            </h2>
+          </div>
+
+          <div class="action-grid">
+            <!-- Get All Voters -->
+            <div class="action-card" onclick="showVotersForm('all')">
+              <div class="action-card-header">
+                <div class="action-icon view">📋</div>
+                <div>
+                  <div class="action-title">Get All Voters</div>
+                  <div class="action-description">View paginated list of all voters</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Get Single Voter -->
+            <div class="action-card" onclick="showVotersForm('single')">
+              <div class="action-card-header">
+                <div class="action-icon view">🔍</div>
+                <div>
+                  <div class="action-title">Get Voter by ID</div>
+                  <div class="action-description">Search specific voter details</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voters Forms Container -->
+          <div id="voters-form-container"></div>
+
+          <!-- Voters Table -->
+          <div id="voters-table-container"></div>
+        </div>
+      </div>
+
+      <!-- Votes Section -->
+      <div id="votes-section" class="content-section hidden">
+        <div class="page-header">
+          <h1 class="page-title">Vote Results</h1>
+          <p class="page-subtitle">View vote counts and analytics</p>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="section-icon">📈</span>
+              Vote Results
+            </h2>
+          </div>
+
+          <div class="action-grid">
+            <!-- Get All Candidate Votes -->
+            <div class="action-card" onclick="showVotesForm('all')">
+              <div class="action-card-header">
+                <div class="action-icon view">📊</div>
+                <div>
+                  <div class="action-title">All Candidate Votes</div>
+                  <div class="action-description">View votes for all candidates</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Get Single Candidate Votes -->
+            <div class="action-card" onclick="showVotesForm('single')">
+              <div class="action-card-header">
+                <div class="action-icon view">🎯</div>
+                <div>
+                  <div class="action-title">Single Candidate Votes</div>
+                  <div class="action-description">Check votes for specific candidate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Votes Forms Container -->
+          <div id="votes-form-container"></div>
+
+          <!-- Votes Results -->
+          <div id="votes-results-container"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Navigation
+    function showSection(sectionName) {
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.add('hidden');
+      });
+
+      // Remove active class from all nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Show selected section
+      document.getElementById(`${sectionName}-section`).classList.remove('hidden');
+
+      // Add active class to clicked nav item
+      event.target.closest('.nav-item').classList.add('active');
+
+      // Close mobile menu
+      if (window.innerWidth <= 1024) {
+        document.getElementById('sidebar').classList.remove('active');
+      }
+    }
+
+    // Mobile sidebar toggle
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    // === ELECTION FORMS ===
+    function showElectionForm(action) {
+      const container = document.getElementById('election-form-container');
+      
+      if (action === 'create') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Create New Election</h3>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">Election Title</label>
+                <input type="text" class="input-field" id="election-title" placeholder="Presidential Election 2025">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Election Type</label>
+                <input type="text" class="input-field" id="election-type" placeholder="General/Local/Special">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">Start Date</label>
+                <input type="date" class="input-field" id="election-start">
+              </div>
+              <div class="input-group">
+                <label class="input-label">End Date</label>
+                <input type="date" class="input-field" id="election-end">
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Description</label>
+              <textarea class="input-field" id="election-desc" placeholder="Election description..."></textarea>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="createElection()">
+                <span>✓</span> Create Election
+              </button>
+              <button class="btn btn-secondary" onclick="clearForm('election-form-container')">
+                <span>✗</span> Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (action === 'update') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Update Election</h3>
+            <div class="input-group">
+              <label class="input-label">Election ID</label>
+              <input type="text" class="input-field" id="update-election-id" placeholder="Enter Election ID">
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">New Title</label>
+                <input type="text" class="input-field" id="update-election-title" placeholder="Updated title">
+              </div>
+              <div class="input-group">
+                <label class="input-label">New Type</label>
+                <input type="text" class="input-field" id="update-election-type" placeholder="Updated type">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">New Start Date</label>
+                <input type="date" class="input-field" id="update-election-start">
+              </div>
+              <div class="input-group">
+                <label class="input-label">New End Date</label>
+                <input type="date" class="input-field" id="update-election-end">
+              </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-info" onclick="updateElection()">
+                <span>↻</span> Update Election
+              </button>
+              <button class="btn btn-secondary" onclick="clearForm('election-form-container')">
+                <span>✗</span> Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (action === 'delete') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Delete Election</h3>
+            <div class="input-group">
+              <label class="input-label">Election ID</label>
+              <input type="text" class="input-field" id="delete-election-id" placeholder="Enter Election ID to delete">
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-danger" onclick="deleteElection()">
+                <span>🗑️</span> Delete Election
+              </button>
+              <button class="btn btn-secondary" onclick="clearForm('election-form-container')">
+                <span>✗</span> Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function createElection() {
+      const title = document.getElementById('election-title').value;
+      const type = document.getElementById('election-type').value;
+      const start = document.getElementById('election-start').value;
+      const end = document.getElementById('election-end').value;
+      const desc = document.getElementById('election-desc').value;
+
+      if (!title || !type || !start || !end) {
+        alert('Please fill all required fields');
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      // Simulate API call
+      setTimeout(() => {
+        console.log('Creating election:', { title, type, start, end, desc });
+        // API: POST /api/elections
+        alert('Election created successfully!');
+        btn.classList.remove('loading');
+        clearForm('election-form-container');
+      }, 1500);
+    }
+
+    function updateElection() {
+      const id = document.getElementById('update-election-id').value;
+      const title = document.getElementById('update-election-title').value;
+
+      if (!id) {
+        alert('Please enter Election ID');
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Updating election:', { id, title });
+        // API: PUT /api/elections/{id}
+        alert(`Election ${id} updated successfully!`);
+        btn.classList.remove('loading');
+        clearForm('election-form-container');
+      }, 1500);
+    }
+
+    function deleteElection() {
+      const id = document.getElementById('delete-election-id').value;
+
+      if (!id) {
+        alert('Please enter Election ID');
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to delete election ${id}?`)) {
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Deleting election:', id);
+        // API: DELETE /api/elections/{id}
+        alert(`Election ${id} deleted successfully!`);
+        btn.classList.remove('loading');
+        clearForm('election-form-container');
+      }, 1500);
+    }
+
+    // === CANDIDATE FORMS ===
+    function showCandidateForm(action) {
+      const container = document.getElementById('candidate-form-container');
+      
+      if (action === 'create') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Register New Candidate</h3>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">Full Name</label>
+                <input type="text" class="input-field" id="candidate-name" placeholder="John Doe">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Party</label>
+                <input type="text" class="input-field" id="candidate-party" placeholder="Democratic Party">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">Election ID</label>
+                <input type="text" class="input-field" id="candidate-election" placeholder="Election ID">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Position</label>
+                <input type="text" class="input-field" id="candidate-position" placeholder="President/Senator">
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Bio</label>
+              <textarea class="input-field" id="candidate-bio" placeholder="Candidate biography..."></textarea>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="createCandidate()">
+                <span>✓</span> Register Candidate
+              </button>
+              <button class="btn btn-secondary" onclick="clearForm('candidate-form-container')">
+                <span>✗</span> Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (action === 'update') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Update Candidate</h3>
+            <div class="input-group">
+              <label class="input-label">Candidate ID</label>
+              <input type="text" class="input-field" id="update-candidate-id" placeholder="Enter Candidate ID">
+            </div>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">New Name</label>
+                <input type="text" class="input-field" id="update-candidate-name" placeholder="Updated name">
+              </div>
+              <div class="input-group">
+                <label class="input-label">New Party</label>
+                <input type="text" class="input-field" id="update-candidate-party" placeholder="Updated party">
+              </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-info" onclick="updateCandidate()">
+                <span>↻</span> Update Candidate
+              </button>
+              <button class="btn btn-secondary" onclick="clearForm('candidate-form-container')">
+                <span>✗</span> Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (action === 'delete') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Delete Candidate</h3>
+            <div class="input-group">
+              <label class="input-label">Candidate ID</label>
+              <input type="text" class="input-field" id="delete-candidate-id" placeholder="Enter Candidate ID">
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-danger" onclick="deleteCandidate()">
+                <span>🗑️</span> Delete Candidate
+              </button>
+              <button class="btn btn-secondary" onclick="clearForm('candidate-form-container')">
+                <span>✗</span> Cancel
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function createCandidate() {
+      const name = document.getElementById('candidate-name').value;
+      const party = document.getElementById('candidate-party').value;
+
+      if (!name || !party) {
+        alert('Please fill all required fields');
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Creating candidate:', { name, party });
+        // API: POST /api/candidates
+        alert('Candidate registered successfully!');
+        btn.classList.remove('loading');
+        clearForm('candidate-form-container');
+      }, 1500);
+    }
+
+    function updateCandidate() {
+      const id = document.getElementById('update-candidate-id').value;
+
+      if (!id) {
+        alert('Please enter Candidate ID');
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Updating candidate:', id);
+        // API: PUT /api/candidates/{id}
+        alert(`Candidate ${id} updated successfully!`);
+        btn.classList.remove('loading');
+        clearForm('candidate-form-container');
+      }, 1500);
+    }
+
+    function deleteCandidate() {
+      const id = document.getElementById('delete-candidate-id').value;
+
+      if (!id) {
+        alert('Please enter Candidate ID');
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to delete candidate ${id}?`)) {
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Deleting candidate:', id);
+        // API: DELETE /api/candidates/{id}
+        alert(`Candidate ${id} deleted successfully!`);
+        btn.classList.remove('loading');
+        clearForm('candidate-form-container');
+      }, 1500);
+    }
+
+    // === VOTERS FORMS ===
+    function showVotersForm(action) {
+      const container = document.getElementById('voters-form-container');
+      
+      if (action === 'all') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Get All Voters (Paginated)</h3>
+            <div class="form-row">
+              <div class="input-group">
+                <label class="input-label">Page Number</label>
+                <input type="number" class="input-field" id="voters-page" placeholder="1" value="1" min="1">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Page Size</label>
+                <input type="number" class="input-field" id="voters-size" placeholder="10" value="10" min="1">
+              </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="getAllVoters()">
+                <span>📋</span> Fetch Voters
+              </button>
+              <button class="btn btn-secondary" onclick="clearVotersData()">
+                <span>✗</span> Clear
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (action === 'single') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Get Voter by ID</h3>
+            <div class="input-group">
+              <label class="input-label">Voter ID</label>
+              <input type="text" class="input-field" id="single-voter-id" placeholder="Enter Voter ID">
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="getSingleVoter()">
+                <span>🔍</span> Search Voter
+              </button>
+              <button class="btn btn-secondary" onclick="clearVotersData()">
+                <span>✗</span> Clear
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function getAllVoters() {
+      const page = document.getElementById('voters-page').value;
+      const size = document.getElementById('voters-size').value;
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Fetching voters:', { page, size });
+        // API: GET /api/voters?page={page}&size={size}
+        
+        // Mock data
+        const mockVoters = [
+          { id: 'V001', name: 'Alice Johnson', email: 'alice@example.com', age: 32, status: 'Active' },
+          { id: 'V002', name: 'Bob Smith', email: 'bob@example.com', age: 45, status: 'Active' },
+          { id: 'V003', name: 'Carol Williams', email: 'carol@example.com', age: 28, status: 'Pending' },
+        ];
+
+        displayVotersTable(mockVoters, page);
+        btn.classList.remove('loading');
+      }, 1500);
+    }
+
+    function getSingleVoter() {
+      const id = document.getElementById('single-voter-id').value;
+
+      if (!id) {
+        alert('Please enter Voter ID');
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Fetching voter:', id);
+        // API: GET /api/voters/{id}
+        
+        const mockVoter = [
+          { id: id, name: 'John Doe', email: 'john@example.com', age: 35, status: 'Active' }
+        ];
+
+        displayVotersTable(mockVoter, 1);
+        btn.classList.remove('loading');
+      }, 1500);
+    }
+
+    function displayVotersTable(voters, page) {
+      const container = document.getElementById('voters-table-container');
+      
+      container.innerHTML = `
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${voters.map(v => `
+                <tr>
+                  <td>${v.id}</td>
+                  <td>${v.name}</td>
+                  <td>${v.email}</td>
+                  <td>${v.age}</td>
+                  <td><span class="badge badge-${v.status === 'Active' ? 'success' : 'warning'}">${v.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button class="pagination-btn" onclick="changePage(${parseInt(page)-1})">Previous</button>
+          <button class="pagination-btn active">${page}</button>
+          <button class="pagination-btn" onclick="changePage(${parseInt(page)+1})">Next</button>
+        </div>
+      `;
+    }
+
+    function changePage(page) {
+      if (page < 1) return;
+      document.getElementById('voters-page').value = page;
+      getAllVoters();
+    }
+
+    function clearVotersData() {
+      document.getElementById('voters-form-container').innerHTML = '';
+      document.getElementById('voters-table-container').innerHTML = '';
+    }
+
+    // === VOTES FORMS ===
+    function showVotesForm(action) {
+      const container = document.getElementById('votes-form-container');
+      
+      if (action === 'all') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Get All Candidate Votes</h3>
+            <div class="input-group">
+              <label class="input-label">Contract Address</label>
+              <input type="text" class="input-field" id="votes-contract" placeholder="0x123...abc">
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="getAllVotes()">
+                <span>📊</span> Get All Votes
+              </button>
+              <button class="btn btn-secondary" onclick="clearVotesData()">
+                <span>✗</span> Clear
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (action === 'single') {
+        container.innerHTML = `
+          <div class="input-form">
+            <h3 style="color:var(--text-primary); margin-bottom:10px;">Get Single Candidate Votes</h3>
+            <div class="input-group">
+              <label class="input-label">Contract Address</label>
+              <input type="text" class="input-field" id="single-votes-contract" placeholder="0x123...abc">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Candidate ID</label>
+              <input type="text" class="input-field" id="single-votes-candidate" placeholder="Enter Candidate ID">
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="getSingleVotes()">
+                <span>🎯</span> Get Candidate Votes
+              </button>
+              <button class="btn btn-secondary" onclick="clearVotesData()">
+                <span>✗</span> Clear
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function getAllVotes() {
+      const contract = document.getElementById('votes-contract').value;
+
+      if (!contract) {
+        alert('Please enter contract address');
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Fetching all votes:', { contract });
+        // API: GET /api/votes/{contractAddress}
+        
+        const mockVotes = [
+          { candidateId: 'C001', name: 'Alice Johnson', party: 'Democratic', votes: 1234 },
+          { candidateId: 'C002', name: 'Bob Smith', party: 'Republican', votes: 987 },
+          { candidateId: 'C003', name: 'Carol Williams', party: 'Independent', votes: 456 },
+        ];
+
+        displayVotesResults(mockVotes);
+        btn.classList.remove('loading');
+      }, 1500);
+    }
+
+    function getSingleVotes() {
+      const contract = document.getElementById('single-votes-contract').value;
+      const candidateId = document.getElementById('single-votes-candidate').value;
+
+      if (!contract || !candidateId) {
+        alert('Please fill all fields');
+        return;
+      }
+
+      const btn = event.target.closest('.btn');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        console.log('Fetching single candidate votes:', { contract, candidateId });
+        // API: POST /api/votes/candidate with body: {contractAddress, candidateId}
+        
+        const mockVotes = [
+          { candidateId: candidateId, name: 'John Candidate', party: 'Democratic', votes: 1567 },
+        ];
+
+        displayVotesResults(mockVotes);
+        btn.classList.remove('loading');
+      }, 1500);
+    }
+
+    function displayVotesResults(votes) {
+      const container = document.getElementById('votes-results-container');
+      
+      const totalVotes = votes.reduce((sum, v) => sum + v.votes, 0);
+      
+      container.innerHTML = `
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Candidate ID</th>
+                <th>Name</th>
+                <th>Party</th>
+                <th>Votes</th>
+                <th>Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${votes.map(v => `
+                <tr>
+                  <td>${v.candidateId}</td>
+                  <td>${v.name}</td>
+                  <td>${v.party}</td>
+                  <td><strong>${v.votes.toLocaleString()}</strong></td>
+                  <td>
+                    <span class="badge badge-info">${((v.votes/totalVotes)*100).toFixed(1)}%</span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:16px; padding:16px; background:var(--bg-secondary); border-radius:8px; border:1px solid var(--border-color);">
+          <strong style="color:var(--text-primary);">Total Votes Cast:</strong> 
+          <span style="color:var(--accent-1); font-size:20px; font-weight:700;">${totalVotes.toLocaleString()}</span>
+        </div>
+      `;
+    }
+
+    function clearVotesData() {
+      document.getElementById('votes-form-container').innerHTML = '';
+      document.getElementById('votes-results-container').innerHTML = '';
+    }
+
+    // === UTILITY FUNCTIONS ===
+    function clearForm(containerId) {
+      document.getElementById(containerId).innerHTML = '';
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 1024) {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+          sidebar.classList.remove('active');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
