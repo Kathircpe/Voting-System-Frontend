@@ -1,8 +1,11 @@
 
 import React, { useState, useRef } from 'react';
 import styles from './verifyAccount.module.css';
+import {useNavigate,Link} from 'react-router-dom';
+
 
 const Verify = () => {
+  const navigate=useNavigate();
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -203,14 +206,14 @@ const Verify = () => {
               ))}
             </button>
 
-            <a href="/signup" className={`${styles.btn} ${styles['btn-secondary']}`}>
+            <Link to="/signup" className={`${styles.btn} ${styles['btn-secondary']}`}>
               <span>Log In</span>
-            </a>
+            </Link>
 
             <button
               type="button"
               className={`${styles.btn} ${styles['btn-secondary']}`}
-              onClick={() => (window.location.href = '/auth/verify')}
+              onClick={() => navigate('/auth/verify')}
             >
               <span>Sign Up</span>
             </button>
@@ -218,12 +221,12 @@ const Verify = () => {
 
           {/* Links */}
           <div className={styles['form-links']}>
-            <a href="/auth/forgot-password" className={styles['form-link']}>
+            <Link to="/auth/forgot-password" className={styles['form-link']}>
               Forgot Password?
-            </a>
-            <a href="/" className={styles['form-link']}>
+            </Link>
+            <Link to="/" className={styles['form-link']}>
               Back to Home
-            </a>
+            </Link>
           </div>
         </form>
 
@@ -233,7 +236,7 @@ const Verify = () => {
 
         <div className={styles['login-footer']}>
           <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
-          <a href="/help">Need Help?</a>
+          <Link to="/help">Need Help?</Link>
         </div>
       </div>
     </div>

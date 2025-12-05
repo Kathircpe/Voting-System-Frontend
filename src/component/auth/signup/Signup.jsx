@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { authService } from '../AuthService';
 import styles from './Signup.module.css';
+import {useNavigate,Link} from 'react-router-dom';
 
 const Signup = () => {
+  const navigate=useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -240,7 +242,7 @@ const Signup = () => {
       setMessage({ text: 'Account created successfully! Redirecting...', type: 'success' });
       
       setTimeout(() => {
-        window.location.href = '/login';
+        navigate('/login');
       }, 1500);
     } catch (error) {
       setMessage({ 
@@ -530,7 +532,7 @@ const Signup = () => {
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSecondary}`}
-              onClick={() => window.location.href = '/login'}
+              onClick={() => navigate('/login')}
             >
               <span>Log In</span>
             </button>
@@ -548,7 +550,7 @@ const Signup = () => {
           </div>
 
           <div className={styles.formLinks}>
-            <a href="/" className={styles.formLink}>Back to Home</a>
+            <Link to="/" className={styles.formLink}>Back to Home</Link>
           </div>
         </form>
 
@@ -558,7 +560,7 @@ const Signup = () => {
 
         <div className={styles.loginFooter}>
           <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
-          <a href="/help">Need Help?</a>
+          <Link to="/help">Need Help?</Link>
         </div>
       </div>
     </div>

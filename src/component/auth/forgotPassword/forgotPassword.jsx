@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './forgotPassword.module.css';
+import {useNavigate,Link} from 'react-router-dom';
 
 const ForgotPassword = () => {
   // Form state
+  const navigate=useNavigate();
   const [email, setEmail] = useState('');
   const [emailValid, setEmailValid] = useState(null); // null | true | false
   const [otp, setOtp] = useState(Array(6).fill(''));
@@ -211,7 +213,7 @@ const ForgotPassword = () => {
     setTimeout(() => {
       setSubmitLoading(false);
       showMessage('Password reset successful! Redirecting to login...', 'success');
-      // navigate('/login'); // uncomment if using react-router
+      navigate('/login'); // uncomment if using react-router
     }, 2000);
   };
 
@@ -471,7 +473,7 @@ const ForgotPassword = () => {
           {/* Back link */}
           <div className={styles['form-links']}>
             {/* Use react-router Link if available */}
-            <a href="/login" className={styles['form-link']}>← Back to Login</a>
+            <Link to="/login" className={styles['form-link']}>← Back to Login</Link>
           </div>
         </form>
 
@@ -481,9 +483,9 @@ const ForgotPassword = () => {
 
         <div className={styles['login-footer']}>
           <p>
-            Remember your password? <a href="/login">Log in here</a>
+            Remember your password? <Link to="/login">Log in here</Link>
           </p>
-          <a href="/help">Need Help?</a>
+          <Link to="/help">Need Help?</Link>
         </div>
       </div>
     </div>

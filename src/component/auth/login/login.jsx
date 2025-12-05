@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { authService } from '../AuthService';
 import styles from './Login.module.css';
+import {useNavigate,Link} from 'react-router-dom';
 
 const Login = () => {
+  const navigate=useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -56,9 +58,9 @@ const Login = () => {
       
       setTimeout(() => {
         if (formData.role === 'admin') {
-          window.location.href = '/admin';
+          navigate('/admin');
         } else {
-          window.location.href = '/voter';
+          navigate('/voter');
         }
       }, 10);
     } catch (error) {
@@ -166,7 +168,7 @@ const Login = () => {
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSecondary}`}
-              onClick={() => window.location.href = '/signup'}
+              onClick={() => navigate('/signup')}
             >
               <span>Sign Up</span>
             </button>
@@ -174,19 +176,19 @@ const Login = () => {
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSecondary}`}
-              onClick={() => window.location.href = '/auth/verify-account'}
+              onClick={() => navigate('/auth/verify-account')}
             >
               <span>✓ Verify Account</span>
             </button>
           </div>
 
           <div className={styles.formLinks}>
-            <a href="/auth/forgot-password" className={styles.formLink}>
+            <Link to="/auth/forgot-password" className={styles.formLink}>
               Forgot Password?
-            </a>
-            <a href="/" className={styles.formLink}>
+            </Link>
+            <Link to="/" className={styles.formLink}>
               Back to Home
-            </a>
+            </Link>
           </div>
         </form>
 
@@ -196,7 +198,7 @@ const Login = () => {
 
         <div className={styles.loginFooter}>
           <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
-          <a href="/help">Need Help?</a>
+          <Link to="/help">Need Help?</Link>
         </div>
       </div>
     </div>
