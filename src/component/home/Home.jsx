@@ -234,7 +234,7 @@ const Home= ()=>{
 
       <footer>
         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-          <div style={{ fontWeight: 700 }}>© 2025 My Vote</div>
+          <div style={{ fontWeight: 700 }}>© {new Date().getFullYear} My Vote</div>
         </div>
       </footer>
     </div>

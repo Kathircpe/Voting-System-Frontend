@@ -60,7 +60,7 @@ const Login = () => {
         } else {
           window.location.href = '/voter';
         }
-      }, 1500);
+      }, 10);
     } catch (error) {
       setMessage({ 
         text: error.response?.data?.message || error.message || 'Login failed', 

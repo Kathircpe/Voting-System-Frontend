@@ -3,9 +3,12 @@ import axios from 'axios';
 import styles from './voter.module.css';
 
 const Voter = () => {
-  if(!localStorage.token){
+ useEffect(() => {
+   if(!localStorage.getItem('token')){
     window.location.href='/login';
-  }
+   }
+  }); 
+  
   const [currentSection, setCurrentSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,7 +31,12 @@ const Voter = () => {
   });
 
   // Profile State
-  const [voterDetails, setVoterDetails] = useState(null);
+  const [voterDetails, setVoterDetails] = useState({
+    name: 'N/A', 
+    id: 'N/A'
+    }
+    );
+const [searchVoterId, setSearchVoterId] = useState('');
 
 // Elections State (put near Candidates State)
 const [elections, setElections] = useState([]);
@@ -50,6 +58,7 @@ const [elections, setElections] = useState([]);
 
   // Update Profile State
   const [updateForm, setUpdateForm] = useState({
+    id:user.id,
     name: '',
     email: '',
     phone: '',
@@ -58,45 +67,116 @@ const [elections, setElections] = useState([]);
   });
   const [updateMessage, setUpdateMessage] = useState(null);
 
-  // API Configuration
+  
+  // const apiCalls = {
+  //   getVoterDetails: async (voterId) => {
+  //     const response = await api.get(`voter/${voterId}`);
+  //     return response.data;
+  //   },
+  // // In apiCalls object, add:
+  // getAllElections: async () => {
+  //   const response = await api.get('/voter/election');
+  //   return response.data;
+  // },
+
+  //   getAllCandidates: async () => {
+  //     const response = await api.get('/voter/candidates');
+  //     return response.data;
+  //   },
+  //   castVote: async (data) => {
+  //     const response = await api.post('/voter/votes/vote', data);
+  //     return response.data;
+  //   },
+  //   getVoteResults: async (contractAddress) => {
+  //     const response = await api.get(`/voter/getVotes/${contractAddress}`);
+  //     return response.data;
+  //   },
+  //   updateVoter: async (voterId, data) => {
+  //     const response = await api.put(`/voter/updateVoter/${voterId}`, data);
+  //     return response.data;
+  //   }
+  // };
   const API_BASE_URL = 'https://voting-system-aztp.onrender.com/api/v1/voter';
-  const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      'Content-Type': 'application/json'
-    }
-  });
 
-  // API Functions
-  const apiCalls = {
-    getVoterDetails: async (voterId) => {
-      const response = await api.get(`/voters/${voterId}`);
-      return response.data;
-    },
-// In apiCalls object, add:
-getAllElections: async () => {
-  const response = await api.get('/elections');
-  return response.data;
-},
+const apiCalls = {
+  getVoterDetails: async (voterId) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/${voterId.trim()}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+   
+    return await response.json();
+  },
 
-    getAllCandidates: async () => {
-      const response = await api.get('/candidates');
-      return response.data;
-    },
-    castVote: async (data) => {
-      const response = await api.post('/votes/vote', data);
-      return response.data;
-    },
-    getVoteResults: async (contractAddress) => {
-      const response = await api.get(`/votes/${contractAddress}`);
-      return response.data;
-    },
-    updateVoter: async (voterId, data) => {
-      const response = await api.put(`/voters/${voterId}`, data);
-      return response.data;
-    }
-  };
+  getAllElections: async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/election`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    const data = await response.json();
+    return data.content || data; // Handle Spring Boot pagination
+  },
+
+  getAllCandidates: async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/candidates`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    const data = await response.json();
+    return data.content || data;
+  },
+
+  castVote: async (data) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/votes/vote`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    return await response.json();
+  },
+
+  getVoteResults: async (contractAddress) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/getVotes/${contractAddress.trim()}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    return await response.json();
+  },
+
+  updateVoter: async ( data) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/updateVoter`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    return await response;
+  }
+};
+
 useEffect(() => {
   if (currentSection === 'elections') {
     loadElections();
@@ -112,11 +192,11 @@ useEffect(() => {
 
   // Handlers
   const handleGetVoterDetails = async (voterId) => {
-    if (!voterId.trim()) {
-      alert('Please enter your Voter ID');
-      return;
-    }
-
+    // if (!voterId.trim()) {
+    //   alert('Please enter your Voter ID');
+    //   return;
+    // }
+    
     try {
       setLoading(true);
       const data = await apiCalls.getVoterDetails(voterId);
@@ -206,36 +286,39 @@ const loadElections = async () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
 
-    const { name, email, phone, age, address } = updateForm;
 
-    if (!name || !email || !phone || !age || !address) {
-      alert('Please fill in all fields');
-      return;
-    }
+    const updateData = {};
+    updateData.id=updateForm.id;
+  if (updateForm.name.trim()) updateData.name = updateForm.name.trim();
+  if (updateForm.email.trim()) updateData.email = updateForm.email.trim();
+  if (updateForm.phone.trim()) updateData.phone = updateForm.phone.trim();
+  if (updateForm.age) updateData.age = parseInt(updateForm.age);
+  if (updateForm.address.trim()) updateData.address = updateForm.address.trim();
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-
-    if (phone.length !== 10 || !/^\d+$/.test(phone)) {
-      alert('Please enter a valid 10-digit phone number');
-      return;
-    }
-
-    if (age < 18) {
-      alert('You must be at least 18 years old');
-      return;
-    }
+  if (Object.keys(updateData).length === 0) {
+    alert('Please fill at least one field');
+    return;
+  }
+   if (updateData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
+    alert('Invalid email');
+    return;
+  }
+  if (updateData.phone && (updateData.phone.length !== 10 || !/^\d+$/.test(updateData.phone))) {
+    alert('Valid 10-digit phone required');
+    return;
+  }
+  if (updateData.age && updateData.age < 18) {
+    alert('Must be 18+');
+    return;
+  }
 
     try {
       setLoading(true);
-      await apiCalls.updateVoter(user.voterId, updateForm);
+      await apiCalls.updateVoter( updateData);
       setUpdateMessage({ type: 'success', text: 'Profile updated successfully! Changes will be reflected shortly.' });
       setTimeout(() => setUpdateMessage(null), 5000);
     } catch (error) {
-      setUpdateMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile. Please try again.' });
+    setUpdateMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -398,7 +481,7 @@ const loadElections = async () => {
               </h2>
 
               <div className={styles.actionGrid}>
-                <div className={styles.actionCard} onClick={() => setCurrentSection('profile')}>
+                <div className={styles.actionCard} onClick={() => setCurrentSection('myProfile')}>
                   <div className={styles.actionIcon}>👤</div>
                   <div>
                     <div className={styles.actionTitle}>View Profile</div>
@@ -444,7 +527,7 @@ const loadElections = async () => {
     <div className={styles.infoCard}>
       <div className={styles.infoRow}>
         <span className={styles.infoLabel}>Voter ID</span>
-        <span className={styles.infoValue}>{user.voterId || user.id}</span>
+        <span className={styles.infoValue}>{user.id}</span>
       </div>
       <div className={styles.infoRow}>
         <span className={styles.infoLabel}>Name</span>
@@ -457,6 +540,17 @@ const loadElections = async () => {
       <div className={styles.infoRow}>
         <span className={styles.infoLabel}>Phone</span>
         <span className={styles.infoValue}>{user.phoneNumber}</span>
+      </div><div className={styles.infoRow}>
+        <span className={styles.infoLabel}>age</span>
+        <span className={styles.infoValue}>{user.age}</span>
+      </div>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Has Voted</span>
+        <span className={styles.infoValue}>{user.hasVoted?'No':'Yes'}</span>
+      </div>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Voter Address</span>
+        <span className={styles.infoValue}>{user.voterAddress}</span>
       </div>
       <div className={styles.infoRow}>
         <span className={styles.infoLabel}>Account Status</span>
@@ -512,16 +606,20 @@ const loadElections = async () => {
         type="text"
         className={styles.inputField}
         placeholder="Enter Voter ID to search"
-        onBlur={(e) => handleGetVoterDetails(e.target.value)}
+        value={searchVoterId}
+        onChange={(e) => setSearchVoterId(e.target.value)}
+        onBlur={() => handleGetVoterDetails(searchVoterId)}
       />
 
       <button 
         className={`${styles.btn} ${styles.btnPrimary}`}
-        onClick={() => handleGetVoterDetails(user.voterId || '')}
-        disabled={loading}
+        onClick={() => handleGetVoterDetails(searchVoterId)}  //  Uses input value
+        disabled={loading || !searchVoterId.trim()}
       >
         {loading ? 'Searching...' : '🔍 Search Voter'}
       </button>
+      
+      
     </div>
 
     {voterDetails && (
@@ -529,8 +627,12 @@ const loadElections = async () => {
         {/* Same voterDetails display as before */}
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>Voter ID</span>
-          <span className={styles.infoValue}>{voterDetails.voterId}</span>
+          <span className={styles.infoValue}>{voterDetails.id}</span>
         </div>
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>Name</span>
+        <span className={styles.infoValue}>{voterDetails.name}</span>
+      </div>
         {/* ... rest of voterDetails fields ... */}
       </div>
     )}
@@ -848,31 +950,31 @@ const loadElections = async () => {
                 <input
                   type="text"
                   className={`${styles.inputField} ${styles.inputFieldDisabled}`}
-                  value={user.voterId}
+                  value={user.id}
+
                   disabled
                 />
 
                 <div className={styles.formRow}>
                   <div>
-                    <label className={styles.label}>Full Name *</label>
+                    <label className={styles.label}>Full Name </label>
                     <input
                       type="text"
                       className={styles.inputField}
-                      placeholder="John Doe"
+                      placeholder="John"
                       value={updateForm.name}
                       onChange={(e) => setUpdateForm({ ...updateForm, name: e.target.value })}
-                      required
+                      
                     />
                   </div>
                   <div>
-                    <label className={styles.label}>Email *</label>
+                    <label className={styles.label}>Email </label>
                     <input
                       type="email"
                       className={styles.inputField}
                       placeholder="john@example.com"
                       value={updateForm.email}
                       onChange={(e) => setUpdateForm({ ...updateForm, email: e.target.value })}
-                      required
                     />
                   </div>
                 </div>
@@ -887,11 +989,10 @@ const loadElections = async () => {
                       maxLength="10"
                       value={updateForm.phone}
                       onChange={(e) => setUpdateForm({ ...updateForm, phone: e.target.value })}
-                      required
                     />
                   </div>
                   <div>
-                    <label className={styles.label}>Age *</label>
+                    <label className={styles.label}>Age </label>
                     <input
                       type="number"
                       className={styles.inputField}
@@ -899,18 +1000,16 @@ const loadElections = async () => {
                       min="18"
                       value={updateForm.age}
                       onChange={(e) => setUpdateForm({ ...updateForm, age: e.target.value })}
-                      required
                     />
                   </div>
                 </div>
 
-                <label className={styles.label}>Address *</label>
+                <label className={styles.label}>Voter Address </label>
                 <textarea
                   className={`${styles.inputField} ${styles.textArea}`}
-                  placeholder="Enter your full address..."
+                  placeholder="Enter your voter address..."
                   value={updateForm.address}
                   onChange={(e) => setUpdateForm({ ...updateForm, address: e.target.value })}
-                  required
                 />
 
                 <div className={styles.btnGroup}>
