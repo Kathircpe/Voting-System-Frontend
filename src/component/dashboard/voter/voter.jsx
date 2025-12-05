@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
 import styles from './voter.module.css';
 
 const Voter = () => {
+  const navigate=useNavigate();
  useEffect(() => {
    if(!localStorage.getItem('token')){
-    window.location.href='/login';
+    navigate('/login');
    }
   }); 
+
   
   const [currentSection, setCurrentSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -414,15 +416,16 @@ const loadElections = async () => {
 
         <div className={styles.navSection}>
           <div className={styles.navTitle}>Account</div>
-          <button className={styles.navItem}>
+          {/* <button className={styles.navItem}>
             <span>⚙️</span>
             <span>Settings</span>
-          </button>
+          </button> */}
           <button 
             className={styles.navItem} 
             onClick={() => {
               localStorage.removeItem('token');
-              window.location.href = '/login';
+              localStorage.removeItem('user');
+              navigate('/login');
             }}
           >
             <span>🚪</span>

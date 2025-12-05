@@ -556,3 +556,97 @@ footer{
     height:40px;
   }
 }
+/* Mobile-first responsive navigation */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+.menu-toggle {
+  display: none; /* Hidden checkbox */
+}
+
+.hamburger {
+  display: none;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+  
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100vh;
+    width: 300px;
+    background: var(--bg-primary);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    transition: right 0.3s ease;
+    padding: 2rem;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+  }
+  
+  .nav-links.nav-open {
+    right: 0;
+  }
+  
+  /* Hero section stacks vertically on mobile */
+  .hero {
+    flex-direction: column !important;
+    gap: 3rem;
+    padding: 2rem 1rem;
+  }
+  
+  .hero-left, .hero-right {
+    width: 100%;
+  }
+  
+  .hero-right {
+    order: -1; /* Mockup appears first on mobile */
+  }
+  
+  /* Features stack */
+  .features {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .nav-links {
+    gap: 1.5rem;
+  }
+  
+  .hero {
+    padding: 2rem;
+  }
+}
+

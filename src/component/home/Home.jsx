@@ -1,16 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
-const Home= ()=>{
-  
+const Home = () => {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleNavigation = (path) => {
-    
     navigate(path);
+    setMenuOpen(false); // Close menu on navigation
   };
-  
 
   return (
     <div className="wrap">
@@ -24,8 +23,14 @@ const Home= ()=>{
         </div>
 
         {/* Mobile menu toggle */}
-        <input id="menu" className="menu-toggle" type="checkbox" aria-hidden="true" />
-        <label htmlFor="menu" className="hamburger" aria-hidden="true">
+        <input 
+          id="menu" 
+          className="menu-toggle" 
+          type="checkbox" 
+          checked={menuOpen}
+          onChange={(e) => setMenuOpen(e.target.checked)}
+        />
+        <label htmlFor="menu" className="hamburger">
           <svg 
             width="28" 
             height="28" 
@@ -35,23 +40,15 @@ const Home= ()=>{
             strokeWidth="1.6" 
             style={{ color: 'var(--muted)' }}
           >
-            <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" strokeLinejoin="round"></path>
+            <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </label>
 
-        <nav>
-          <a onClick={() => handleNavigation('/login')} style={{ cursor: 'pointer' }}>
-            Log In
-          </a>
-          <a onClick={() => handleNavigation('/signup')} style={{ cursor: 'pointer' }}>
-            Sign Up
-          </a>
-          <a onClick={() => handleNavigation('/documentation')} style={{ cursor: 'pointer' }}>
-            Documentation
-          </a>
-          <a  style={{ cursor: 'pointer' }}>
-            Help(coming soon)
-          </a>
+        <nav className={`nav-links ${menuOpen ? 'nav-open' : ''}`}>
+          <a onClick={() => handleNavigation('/login')}>Log In</a>
+          <a onClick={() => handleNavigation('/signup')}>Sign Up</a>
+          <a onClick={() => handleNavigation('/documentation')}>Documentation</a>
+          <a>Help (coming soon)</a>
         </nav>
       </header>
 
@@ -88,9 +85,7 @@ const Home= ()=>{
             </article>
           </div>
 
-         
-
-          <div className="testimonials" id="testimonials" aria-hidden="false">
+          <div className="testimonials" id="testimonials">
             <div style={{ padding: '14px 0 0 2px', color: 'var(--muted)', fontWeight: 700 }}>
               What people say
             </div>
@@ -234,11 +229,10 @@ const Home= ()=>{
 
       <footer>
         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-          <div style={{ fontWeight: 700 }}>© {new Date().getFullYear} My Vote</div>
+          <div style={{ fontWeight: 700 }}>© {new Date().getFullYear()} My Vote</div>
         </div>
       </footer>
     </div>
-    
   );
 };
 
