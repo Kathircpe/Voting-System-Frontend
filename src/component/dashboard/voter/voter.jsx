@@ -971,7 +971,7 @@ const loadElections = async () => {
                     />
                   </div>
                   <div>
-                    <label className={styles.label}>Email </label>
+                    <label className={styles.label}></label>
                     <input
                       type="email"
                       className={styles.inputField}
@@ -984,7 +984,7 @@ const loadElections = async () => {
 
                 <div className={styles.formRow}>
                   <div>
-                    <label className={styles.label}>Phone Number *</label>
+                    <label className={styles.label}></label>
                     <input
                       type="tel"
                       className={styles.inputField}
