@@ -27,10 +27,8 @@ function App() {
       <Route path="/auth/verify-account" element={<VerifyAccount />}/>
       <Route path="/voter" element={<Voter />} />
       <Route path="/admin" element={<Admin />} />
-
       <Route path="/documentation" element={<Documentation />} /> 
-      
-      <Route path="/*" element={<Home />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
 
     </Routes>
     </BrowserRouter>

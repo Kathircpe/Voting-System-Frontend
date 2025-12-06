@@ -23,32 +23,34 @@ const Home = () => {
         </div>
 
         {/* Mobile menu toggle */}
-        <input 
-          id="menu" 
-          className="menu-toggle" 
-          type="checkbox" 
-          checked={menuOpen}
-          onChange={(e) => setMenuOpen(e.target.checked)}
-        />
-        <label htmlFor="menu" className="hamburger">
-          <svg 
-            width="28" 
-            height="28" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="1.6" 
+        <button
+          className="hamburger"
+          aria-label="Toggle navigation"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
             style={{ color: 'var(--muted)' }}
           >
-            <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" strokeLinejoin="round"/>
+            <path
+              d="M4 7h16M4 12h16M4 17h16"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
-        </label>
+        </button>
 
         <nav className={`nav-links ${menuOpen ? 'nav-open' : ''}`}>
-          <a onClick={() => handleNavigation('/login')}>Log In</a>
-          <a onClick={() => handleNavigation('/signup')}>Sign Up</a>
-          <a onClick={() => handleNavigation('/documentation')}>Documentation</a>
-          <a>Help (coming soon)</a>
+          <button onClick={() => handleNavigation('/login')}>Log In</button>
+          <button onClick={() => handleNavigation('/signup')}>Sign Up</button>
+          <button onClick={() => handleNavigation('/documentation')}>Documentation</button>
+          <button disabled>Help (coming soon)</button>
         </nav>
       </header>
 
@@ -72,34 +74,40 @@ const Home = () => {
             <article className="card">
               <h3>Indian Democracy</h3>
               <p>
-                India has a parliamentary system as defined by its constitution, with power 
+                India has a parliamentary system as defined by its constitution, with power
                 distributed between the union government and the states.
               </p>
             </article>
             <article className="card">
               <h3>Election Commission of India (ECI)</h3>
               <p>
-                The Election Commission of India (ECI) is an autonomous authority of India that 
+                The Election Commission of India (ECI) is an autonomous authority of India that
                 is enacted under the provisions of the Constitution.
               </p>
             </article>
           </div>
 
           <div className="testimonials" id="testimonials">
-            <div style={{ padding: '14px 0 0 2px', color: 'var(--muted)', fontWeight: 700 }}>
+            <div
+              style={{
+                padding: '14px 0 0 2px',
+                color: 'var(--muted)',
+                fontWeight: 700,
+              }}
+            >
               What people say
             </div>
             <div className="t-track" style={{ marginTop: '14px' }}>
               <div className="t">
                 <p>
-                  "The danger is not that a particular class is unfit to govern. Every class is 
+                  "The danger is not that a particular class is unfit to govern. Every class is
                   unfit to govern."
                 </p>
                 <strong>- Lord Acton</strong>
               </div>
               <div className="t">
                 <p>
-                  "Liberty cannot be preserved without a general knowledge among the people, who 
+                  "Liberty cannot be preserved without a general knowledge among the people, who
                   have a right … and a desire to know."
                 </p>
                 <strong>- John Adams</strong>
@@ -119,7 +127,7 @@ const Home = () => {
           <div className="device" role="img" aria-label="Animated mockup">
             <div className="screen">
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div 
+                <div
                   style={{
                     width: '54px',
                     height: '54px',
@@ -127,28 +135,36 @@ const Home = () => {
                     background: 'linear-gradient(135deg,var(--accent-1),var(--accent-2))',
                     display: 'grid',
                     placeItems: 'center',
-                    fontWeight: 700
+                    fontWeight: 700,
                   }}
                 >
                   ECI
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div 
+                  <div
                     style={{
                       height: '10px',
                       background: 'rgba(255,255,255,0.03)',
                       borderRadius: '6px',
-                      marginBottom: '6px'
+                      marginBottom: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingInline: '4px',
+                      fontSize: '10px',
                     }}
                   >
                     Election Commission of
                   </div>
-                  <div 
+                  <div
                     style={{
                       height: '8px',
                       width: '68%',
                       background: 'rgba(255,255,255,0.02)',
-                      borderRadius: '6px'
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingInline: '4px',
+                      fontSize: '9px',
                     }}
                   >
                     India
@@ -156,58 +172,64 @@ const Home = () => {
                 </div>
               </div>
 
-              <div 
+              <div
                 style={{
                   flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
-                  gap: '10px'
+                  gap: '10px',
                 }}
               >
-                <div 
+                <div
                   style={{
                     height: '10px',
                     width: '92%',
-                    background: 'linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+                    background:
+                      'linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
                     borderRadius: '6px',
                     transform: 'translateX(-2px)',
-                    animation: 'screenShimmer 10s linear infinite'
+                    animation: 'screenShimmer 10s linear infinite',
                   }}
                 ></div>
                 <div style={{ display: 'flex', gap: '10px' }}>
-                  <div 
+                  <div
                     style={{
                       flex: 1,
                       height: '76px',
-                      background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
+                      background:
+                        'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
                       borderRadius: '10px',
                       padding: '8px',
                       display: 'flex',
                       flexDirection: 'column',
-                      justifyContent: 'space-between'
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <div 
+                    <div
                       style={{
                         height: '8px',
                         width: '60%',
                         background: 'rgba(255,255,255,0.02)',
-                        borderRadius: '6px'
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        paddingInline: '4px',
+                        fontSize: '9px',
                       }}
                     >
                       Polling percentage
                     </div>
-                    <div 
+                    <div
                       style={{
                         height: '8px',
                         width: '80%',
                         background: 'rgba(255,255,255,0.02)',
-                        borderRadius: '6px'
+                        borderRadius: '6px',
                       }}
                     ></div>
                   </div>
-                  <div 
+                  <div
                     style={{
                       width: '70px',
                       height: '70px',
@@ -215,7 +237,8 @@ const Home = () => {
                       background: 'linear-gradient(135deg,var(--accent-2),var(--accent-1))',
                       display: 'grid',
                       placeItems: 'center',
-                      fontWeight: 800
+                      fontWeight: 800,
+                      fontSize: '14px',
                     }}
                   >
                     69.74%
