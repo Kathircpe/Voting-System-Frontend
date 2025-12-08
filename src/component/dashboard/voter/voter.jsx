@@ -964,7 +964,7 @@ const loadElections = async () => {
                     <input
                       type="text"
                       className={styles.inputField}
-                      placeholder="John"
+                      placeholder="Full name"
                       value={updateForm.name}
                       onChange={(e) => setUpdateForm({ ...updateForm, name: e.target.value })}
                       
@@ -975,7 +975,7 @@ const loadElections = async () => {
                     <input
                       type="email"
                       className={styles.inputField}
-                      placeholder="john@example.com"
+                      placeholder="email : john@example.com"
                       value={updateForm.email}
                       onChange={(e) => setUpdateForm({ ...updateForm, email: e.target.value })}
                     />
@@ -988,7 +988,7 @@ const loadElections = async () => {
                     <input
                       type="tel"
                       className={styles.inputField}
-                      placeholder="1234567890"
+                      placeholder="mobile number"
                       maxLength="10"
                       value={updateForm.phone}
                       onChange={(e) => setUpdateForm({ ...updateForm, phone: e.target.value })}
@@ -999,7 +999,7 @@ const loadElections = async () => {
                     <input
                       type="number"
                       className={styles.inputField}
-                      placeholder="25"
+                      placeholder="age"
                       min="18"
                       value={updateForm.age}
                       onChange={(e) => setUpdateForm({ ...updateForm, age: e.target.value })}
@@ -1010,7 +1010,7 @@ const loadElections = async () => {
                 <label className={styles.label}>Voter Address </label>
                 <textarea
                   className={`${styles.inputField} ${styles.textArea}`}
-                  placeholder="Enter your voter address..."
+                  placeholder="Enter your voterAddress..."
                   value={updateForm.address}
                   onChange={(e) => setUpdateForm({ ...updateForm, address: e.target.value })}
                 />

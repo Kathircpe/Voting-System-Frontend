@@ -10,15 +10,19 @@ export const authService={
         return response.data;
     },
     async verifyAccount(credentials){
-        const response=await api.post('/auth/verify-account',credentials);
+        const response=await api.post('/auth/vo/verification',credentials);
         return response.data;
     },
-    async generateOtp(email){
-        const response=await api.post(`/auth/forgot-password/${email}`);
+    async generateOtpVo(email){
+        const response=await api.post(`/auth/vo/${email}`,{});
+        return response.data;
+    },
+    async generateOtpAd(email){
+        const response=await api.post(`/auth/ad/${email}`,{});
         return response.data;
     },
     async forgotPassword(credentials){
-        const response=await api.post('/auth/forgot-password',credentials);
+        const response=await api.post('/auth/forgotPassword',credentials);
         return response.data;
     },
 };

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL='https://voting-system-aztp.onrender.com/api/v1/';
+const API_BASE_URL='https://voting-system-aztp.onrender.com/api/v1';
 
 export const api=axios.create({
     baseURL:API_BASE_URL,
@@ -13,9 +13,11 @@ export const api=axios.create({
 api.interceptors.request.use(
     (config)=>{
         const token=localStorage.getItem('token');
-        if(token){
-            config.headers.Authorization=`Bearer ${token}`;
-        }
+        
+        if (token && !config.url.includes('/auth/')) {
+    config.headers.Authorization = `Bearer ${token}`;
+}
+
         return config;
     },
     (error)=>{

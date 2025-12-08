@@ -31,10 +31,12 @@ const Signup = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    if(value!=='voter'){
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
 
     if (name === 'password') {
       checkPasswordStrength(value);
@@ -134,10 +136,6 @@ const Signup = () => {
       isValid = false;
     }
 
-    if (!formData.role) {
-      isValid = false;
-    }
-
     return isValid;
   };
 
@@ -146,17 +144,28 @@ const Signup = () => {
       setMessage({ text: 'Please fill all fields correctly before generating OTP', type: 'error' });
       return;
     }
-
-    setIsLoading(true);
+  setIsLoading(true);
 
     try {
-      await authService.generateOtp(formData.email);
-      setOtpGenerated(true);
+      const credentials = {
+        name: formData.name,
+        age: formData.age,
+        email: formData.email,
+        phoneNumber: formData.phone,
+        voterAddress: formData.address,
+        password: formData.password
+      };
+
+      await authService.signUp(credentials);
+      // await authService.generateOtpVo(credentials.email);
       setShowOtp(true);
-      setMessage({ text: 'OTP sent to your email! Please check your inbox.', type: 'success' });
+      setOtpGenerated(true);
+      setMessage({ text: 'successfully otp generated', type: 'success' });
+
     } catch (error) {
+      console.log('Full error:', error.response); 
       setMessage({ 
-        text: error.response?.data?.message || 'Failed to generate OTP', 
+        text: error.response?.data?.message || error.message || 'Signup failed', 
         type: 'error' 
       });
     } finally {
@@ -182,8 +191,13 @@ const Signup = () => {
     }
   };
 
-  const handleVerifyAccount = async () => {
-    const otpValue = otp.join('');
+  // const handleVerifyAccount = async () => {
+    
+  // };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+   const otpValue = otp.join('');
     
     if (otpValue.length !== 6) {
       setMessage({ text: 'Please enter the complete 6-digit OTP', type: 'error' });
@@ -199,7 +213,12 @@ const Signup = () => {
       };
       
       await authService.verifyAccount(credentials);
-      setMessage({ text: 'Account verified successfully! You can now sign up.', type: 'success' });
+      
+      setMessage({ text: 'Account verified successfully! Redirecting...', type: 'success' });
+
+      setTimeout(() => {
+        navigate('/login');
+      }, 500);
     } catch (error) {
       setMessage({ 
         text: error.response?.data?.message || 'Verification failed', 
@@ -208,50 +227,7 @@ const Signup = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!otpGenerated) {
-      setMessage({ text: 'Please generate and verify OTP first', type: 'error' });
-      return;
-    }
-
-    const otpValue = otp.join('');
-    if (otpValue.length !== 6) {
-      setMessage({ text: 'Please enter the complete OTP', type: 'error' });
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const credentials = {
-        name: formData.name,
-        age: parseInt(formData.age),
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        password: formData.password,
-        role: formData.role,
-        otp: otpValue
-      };
-
-      await authService.signUp(credentials);
-      setMessage({ text: 'Account created successfully! Redirecting...', type: 'success' });
-      
-      setTimeout(() => {
-        navigate('/login');
-      }, 1500);
-    } catch (error) {
-      setMessage({ 
-        text: error.response?.data?.message || error.message || 'Signup failed', 
-        type: 'error' 
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    
   };
 
   const hideMessage = () => {
@@ -473,7 +449,7 @@ const Signup = () => {
             )}
           </div>
 
-          {/* Role Selector */}
+          {/* Role Selector
           <div className={styles.inputGroup}>
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}>🎭</span>
@@ -486,10 +462,10 @@ const Signup = () => {
                 required
               >
                 <option value="">Select your role</option>
-                <option value="VOTER">Voter</option>
+                <option value="voter">Voter</option>
               </select>
             </div>
-          </div>
+          </div> */}
 
           {/* Generate OTP Button */}
           <button
@@ -537,7 +513,7 @@ const Signup = () => {
               <span>Log In</span>
             </button>
 
-            {otpGenerated && (
+            {/* {otpGenerated && (
               <button
                 type="button"
                 className={`${styles.btn} ${styles.btnSecondary} ${isLoading ? styles.loading : ''}`}
@@ -546,7 +522,7 @@ const Signup = () => {
               >
                 <span style={{ opacity: isLoading ? 0 : 1 }}>✓ Verify Account</span>
               </button>
-            )}
+            )} */}
           </div>
 
           <div className={styles.formLinks}>
