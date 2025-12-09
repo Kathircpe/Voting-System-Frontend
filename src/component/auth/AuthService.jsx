@@ -14,11 +14,11 @@ export const authService={
         return response.data;
     },
     async generateOtpVo(email){
-        const response=await api.post(`/auth/vo/${email}`,{});
+        const response=await api.post(`/auth/vo/${email}`);
         return response.data;
     },
     async generateOtpAd(email){
-        const response=await api.post(`/auth/ad/${email}`,{});
+        const response=await api.post(`/auth/ad/${email}`);
         return response.data;
     },
     async forgotPassword(credentials){

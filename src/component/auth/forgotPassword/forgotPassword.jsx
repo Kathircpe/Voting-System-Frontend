@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './forgotPassword.module.css';
 import {useNavigate,Link} from 'react-router-dom';
+import { authService } from '../AuthService';
+
 
 const ForgotPassword = () => {
   // Form state
@@ -10,6 +12,8 @@ const ForgotPassword = () => {
   const [otp, setOtp] = useState(Array(6).fill(''));
   const otpRefs = useRef([]);
   const [otpGenerated, setOtpGenerated] = useState(false);
+  const [role, setRole] = useState(''); // 'VOTER' | 'ADMIN' | ''
+
 
   // Timer
   const [timeRemaining, setTimeRemaining] = useState(60);
@@ -92,58 +96,81 @@ const ForgotPassword = () => {
   };
 
   // Generate / Resend OTP
-  const handleGenerateOtp = (e) => {
-    if (!email || !emailRegex.test(email)) {
-      showMessage('Please enter a valid email address', 'error');
-      setEmailValid(false);
-      return;
-    }
-    // Ripple for this button
-    addRipple(e, 'gen');
+  const handleGenerateOtp = async (e) => {
+  if (!email || !emailRegex.test(email)) {
+    showMessage('Please enter a valid email address', 'error');
+    setEmailValid(false);
+    return;
+  }
+  if (!role) {
+    showMessage('Please select your role', 'error');
+    return;
+  }
 
-    setGenLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setGenLoading(false);
-      setOtpGenerated(true);
-      setTimerRunning(true);
-      setTimeRemaining(60);
-      showMessage('OTP sent to your email! Please check your inbox.', 'success');
-      // Focus first OTP box
-      otpRefs.current?.[0]?.focus();
-    }, 2000);
-  };
+  addRipple(e, 'gen');
+  setGenLoading(true);
+
+  try{
+
+    if(role==='admin'){
+      await authService.generateOtpAd(email);
+    }
+    else if(role==='voter'){
+
+      await authService.generateOtpVo(email);
+
+    }
+    setOtpGenerated(true);
+    setTimerRunning(true);
+    setTimeRemaining(60);
+    showMessage('otp has been successfully sent', 'success');
+    otpRefs.current?.[0]?.focus();
+  
+  }
+  catch(error){
+    showMessage(error.response.data||"error occured", 'error');
+
+  }
+  finally{
+  setGenLoading(false);
+  }
+};
+
 
   // Enable resend when timer complete (derived by timeRemaining & timerRunning)
   const canResend = !timerRunning && otpGenerated;
 
   // OTP handlers
   const handleOtpChange = (index, value) => {
-    // allow only single char, typically digits but you can relax if needed
-    const char = value.slice(-1);
-    if (!char) {
-      // deletion
-      setOtp(prev => {
-        const next = [...prev];
-        next[index] = '';
-        return next;
-      });
-      return;
-    }
-    if (!/^\d$/.test(char)) return;
-
+  const char = value.slice(-1);
+  if (!char) {
     setOtp(prev => {
       const next = [...prev];
-      next[index] = char;
+      next[index] = '';
       return next;
     });
-    if (index < otp.length - 1) {
-      otpRefs.current[index + 1]?.focus();
-    } else {
-      // Last digit filled
-      maybeShowPasswordFields();
+    return;
+  }
+  if (!/^\d$/.test(char)) return;
+
+  setOtp(prev => {
+    const next = [...prev];
+    next[index] = char;
+
+    // if last digit, check with up-to-date value
+    if (index === next.length - 1) {
+      const nextOtpString = next.join('');
+      maybeShowPasswordFields(nextOtpString);
     }
-  };
+
+    return next;
+  });
+
+  if (index < otp.length - 1) {
+    otpRefs.current[index + 1]?.focus();
+  }
+};
+
 
   const handleOtpKeyDown = (index, e) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
@@ -160,20 +187,24 @@ const ForgotPassword = () => {
     setOtp(next);
     // If complete, show password fields
     if (paste.length === 6) {
-      maybeShowPasswordFields();
-    } else {
+      maybeShowPasswordFields(paste);
+    }
+    else {
       otpRefs.current[paste.length]?.focus();
     }
   };
 
-  const maybeShowPasswordFields = () => {
-    if (otpString.length === 6 && otpString.replace(/\D/g, '').length === 6) {
-      showMessage('OTP verified! Please enter your new password.', 'success');
-      setShowPasswordSection(true);
-      setShowSubmit(true);
-      setTimerRunning(false);
-    }
-  };
+  const maybeShowPasswordFields = (currentOtpString) => {
+  const onlyDigits = currentOtpString.replace(/\D/g, '');
+  if (onlyDigits.length === 6 && role) {
+    showMessage('OTP filled! Please enter your new password.', 'success');
+    setShowPasswordSection(true);
+    setShowSubmit(true);
+    setTimerRunning(false);
+  }
+};
+
+
 
   // Password validations
   const handleNewPasswordBlur = () => {
@@ -193,7 +224,7 @@ const ForgotPassword = () => {
   };
 
   // Submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (otpString.length !== 6) {
@@ -208,13 +239,35 @@ const ForgotPassword = () => {
       showMessage('Passwords do not match', 'error');
       return;
     }
-
+    const credentials={
+      'email':email,
+      'otp':otpString,
+      'role':role,
+      'password':newPassword
+    };
     setSubmitLoading(true);
+     try{
+
+    if(role==='admin'||role==='voter'){
+      await authService.forgotPassword(credentials);
+    }
+     else{
+     showMessage(error.response.data||"define the role", 'error');
+      return;
+    }
     setTimeout(() => {
-      setSubmitLoading(false);
+      
       showMessage('Password reset successful! Redirecting to login...', 'success');
-      navigate('/login'); // uncomment if using react-router
-    }, 2000);
+      navigate('/login');
+    }, 200);
+  }
+  catch(error){
+    showMessage(error.response.data||"error occured", 'error');
+  }
+  finally{
+    setSubmitLoading(false);
+  setGenLoading(false);
+  }
   };
 
   // Ripple helpers
@@ -289,6 +342,26 @@ const ForgotPassword = () => {
               {emailValid === true ? 'Valid email' : emailValid === false ? 'Please enter a valid email address' : ''}
             </div>
           </div>
+          {/* Role selector */}
+          <div className={styles['input-group']}>
+            <div className={styles['input-wrapper']}>
+              <span className={styles['input-icon']}>👤</span>
+              <select
+                id="role"
+                name="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                disabled={otpGenerated} // optional: lock role after OTP
+                style={otpGenerated ? { opacity: 0.6 } : undefined}
+                required
+              >
+                <option value="">Select your role</option>
+                <option value="voter">Voter</option>
+                <option value="admin">Admin</option>
+              </select>
+              <label htmlFor="role"></label>
+            </div>
+          </div>
 
           {/* Generate / Resend OTP */}
           <button
@@ -337,7 +410,7 @@ const ForgotPassword = () => {
                 onChange={(e) => handleOtpChange(idx, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                 ref={(el) => (otpRefs.current[idx] = el)}
-                disabled={showPasswordSection}
+                // disabled={showPasswordSection}
                 style={showPasswordSection ? { opacity: 0.6 } : undefined}
                 inputMode="numeric"
                 pattern="[0-9]*"

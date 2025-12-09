@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import styles from './verifyAccount.module.css';
 import {useNavigate,Link} from 'react-router-dom';
+import { authService } from '../AuthService';
 
 
 const Verify = () => {
@@ -13,7 +14,7 @@ const Verify = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [loading, setLoading] = useState(false);
-
+  const[otpGenerated,setOtpGenerated]=useState(false);
   // Ripple state
   const [ripples, setRipples] = useState([]);
   const messageTimeoutRef = useRef(null);
@@ -40,11 +41,11 @@ const Verify = () => {
   };
 
   // Form validation and submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Basic validation
-    if (!email || !password || !role) {
+    if (!email || !password) {
       showMessage('Please fill in all fields', 'error');
       return;
     }
@@ -56,30 +57,67 @@ const Verify = () => {
       return;
     }
 
-    // Password validation (minimum 6 characters)
-    if (password.length < 6) {
-      showMessage('Password must be at least 6 characters', 'error');
-      return;
-    }
-
     // Add loading state
     setLoading(true);
 
     // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      showMessage('Login successful! Redirecting...', 'success');
+    try{
+      const credentials={
+      'email':email,
+      'otp': password
+       };
 
-      // Redirect based on role (uncomment when backend is ready)
-      // setTimeout(() => {
-      //   if (role === 'ADMIN') {
-      //     window.location.href = '/admin/dashboard';
-      //   } else {
-      //     window.location.href = '/voter/dashboard';
-      //   }
-      // }, 1500);
-    }, 2000);
+      await authService.verifyAccount(credentials);
+
+      showMessage('veification successful! Redirecting...', 'success');
+
+      setTimeout(() => {
+        navigate('/login');
+      }, 50);
+    }
+    catch(error){
+      showMessage(error.response.data || 'Verification failed','error');
+    }
+    finally{
+      setLoading(false);
+    }
+    
   };
+
+  //generate otp
+   const generateOtp = async () =>{
+    
+    
+    // Basic validation
+    if (!email) {
+      showMessage('Please fill in email', 'error');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+    // Add loading state
+    setLoading(true);
+
+    // Simulate API call
+    try{
+      await authService.generateOtpVo(email);
+      setOtpGenerated(true);
+
+      showMessage('Otp sent successful! Redirecting...', 'success');
+
+    }
+    catch(error){
+      showMessage(error.response.data || 'otp generation failed','error');
+    }
+    finally{
+      setLoading(false);
+    }
+   }
 
   // Ripple effect handler
   const handleRipple = (e) => {
@@ -133,8 +171,35 @@ const Verify = () => {
               <label htmlFor="email">Email Address</label>
             </div>
           </div>
-
+            <button
+              type="button"
+              className={`${styles.btn} ${styles['btn-primary']} ${loading ? styles.loading : ''}`}
+              onClick={(e)=>{
+                handleRipple(e);
+                generateOtp();
+              }}
+            >
+              <span>Get otp</span>
+              {ripples.map((r) => (
+                <span
+                  key={r.id}
+                  style={{
+                    position: 'absolute',
+                    width: r.size,
+                    height: r.size,
+                    top: r.y,
+                    left: r.x,
+                    background: 'rgba(255,255,255,0.3)',
+                    borderRadius: '50%',
+                    transform: 'scale(0)',
+                    animation: 'ripple 0.6s ease-out',
+                    pointerEvents: 'none',
+                  }}
+                />
+              ))}
+            </button>
           {/* Password Input */}
+          {otpGenerated&&
           <div className={styles['input-group']}>
             <div className={styles['input-wrapper']}>
               <span className={styles['input-icon']}>🔒</span>
@@ -142,7 +207,7 @@ const Verify = () => {
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
-                placeholder=" "
+                placeholder=""
                 required
                 autoComplete="current-password"
                 value={password}
@@ -158,9 +223,9 @@ const Verify = () => {
                 <span>{showPassword ? '🙈' : '👁️'}</span>
               </button>
             </div>
-          </div>
+          </div>}
 
-          {/* Role Selector */}
+          {/* Role Selector
           <div className={styles['input-group']}>
             <div className={styles['input-wrapper']}>
               <span className={styles['input-icon']}>👤</span>
@@ -177,14 +242,14 @@ const Verify = () => {
                 <option value="ADMIN">Admin</option>
               </select>
             </div>
-          </div>
+          </div> */}
 
           {/* Buttons */}
           <div className={styles['btn-group']}>
             <button
               type="submit"
               className={`${styles.btn} ${styles['btn-primary']} ${loading ? styles.loading : ''}`}
-              onClick={handleRipple}
+              onClick={(e)=>handleRipple(e)}
             >
               <span>✓ Verify Account</span>
               {ripples.map((r) => (

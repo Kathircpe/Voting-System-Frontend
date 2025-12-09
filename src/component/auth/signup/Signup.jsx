@@ -157,7 +157,7 @@ const Signup = () => {
       };
 
       await authService.signUp(credentials);
-      // await authService.generateOtpVo(credentials.email);
+      
       setShowOtp(true);
       setOtpGenerated(true);
       setMessage({ text: 'successfully otp generated', type: 'success' });
@@ -165,7 +165,7 @@ const Signup = () => {
     } catch (error) {
       console.log('Full error:', error.response); 
       setMessage({ 
-        text: error.response?.data?.message || error.message || 'Signup failed', 
+        text: error.response.data || error.message || 'Signup failed', 
         type: 'error' 
       });
     } finally {
@@ -191,9 +191,7 @@ const Signup = () => {
     }
   };
 
-  // const handleVerifyAccount = async () => {
-    
-  // };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -218,10 +216,10 @@ const Signup = () => {
 
       setTimeout(() => {
         navigate('/login');
-      }, 500);
+      }, 10);
     } catch (error) {
       setMessage({ 
-        text: error.response?.data?.message || 'Verification failed', 
+        text: error.response.data || 'Verification failed', 
         type: 'error' 
       });
     } finally {
@@ -494,7 +492,12 @@ const Signup = () => {
               ))}
             </div>
           )}
-
+            {otpGenerated && (
+              <div style={{textAlign:'center'}}>
+                <span  style={{ opacity: isLoading ? 0 : 1 }}>check spam mails too!</span>
+                </div>
+              
+            )}
           {/* Buttons */}
           <div className={styles.btnGroup}>
             <button
@@ -512,17 +515,6 @@ const Signup = () => {
             >
               <span>Log In</span>
             </button>
-
-            {/* {otpGenerated && (
-              <button
-                type="button"
-                className={`${styles.btn} ${styles.btnSecondary} ${isLoading ? styles.loading : ''}`}
-                onClick={handleVerifyAccount}
-                disabled={isLoading}
-              >
-                <span style={{ opacity: isLoading ? 0 : 1 }}>✓ Verify Account</span>
-              </button>
-            )} */}
           </div>
 
           <div className={styles.formLinks}>

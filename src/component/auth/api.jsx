@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import {useNavigate} from 'react-router-dom';
 const API_BASE_URL='https://voting-system-aztp.onrender.com/api/v1';
 
 export const api=axios.create({
@@ -26,13 +26,14 @@ api.interceptors.request.use(
 );
 
 //token expiration
-api.interceptors.response.use(
-    (response)=> response,
-    (error)=>{
-        if(error.response?.status===401){
-            localStorage.removeItem('token');
-            window.location.href='/login';
-        }
-        return Promise.reject(error);
-    }
-);
+// api.interceptors.response.use(
+//     (response)=> response,
+//     (error)=>{
+//         if(error.response?.status===401){
+//              const navigate=useNavigate();
+//             localStorage.removeItem('token');
+//             navigate('/login');
+//         }
+//         return Promise.reject(error);
+//     }
+// );
