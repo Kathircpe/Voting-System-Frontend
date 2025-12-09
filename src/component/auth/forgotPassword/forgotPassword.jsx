@@ -57,7 +57,7 @@ const ForgotPassword = () => {
   // Timer effect
   useEffect(() => {
     if (!timerRunning) return;
-    setTimeRemaining(60);
+    setTimeRemaining(120);
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
@@ -200,7 +200,6 @@ const ForgotPassword = () => {
     showMessage('OTP filled! Please enter your new password.', 'success');
     setShowPasswordSection(true);
     setShowSubmit(true);
-    setTimerRunning(false);
   }
 };
 
