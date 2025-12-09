@@ -16,7 +16,7 @@ const ForgotPassword = () => {
 
 
   // Timer
-  const [timeRemaining, setTimeRemaining] = useState(60);
+  const [timeRemaining, setTimeRemaining] = useState(120);
   const [timerRunning, setTimerRunning] = useState(false);
 
   // UI sections
@@ -122,7 +122,7 @@ const ForgotPassword = () => {
     }
     setOtpGenerated(true);
     setTimerRunning(true);
-    setTimeRemaining(60);
+    setTimeRemaining(120);
     showMessage('otp has been successfully sent', 'success');
     otpRefs.current?.[0]?.focus();
   
@@ -411,7 +411,7 @@ const ForgotPassword = () => {
                 onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                 ref={(el) => (otpRefs.current[idx] = el)}
                 // disabled={showPasswordSection}
-                style={showPasswordSection ? { opacity: 0.6 } : undefined}
+                // style={showPasswordSection ? { opacity: 0.6 } : undefined}
                 inputMode="numeric"
                 pattern="[0-9]*"
                 aria-label={`OTP digit ${idx + 1}`}
