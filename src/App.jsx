@@ -11,11 +11,6 @@ import Admin from './component/dashboard/admin/admin.jsx'
 import Voter from './component/dashboard/voter/voter.jsx'
 
 function App() {
-  useEffect(() => {
-    fetch('https://voting-system-aztp.onrender.com/api/v1/auth/ping')
-    .then(()=> console.log("DB and backend is awake"))
-    .catch(err => console.log(err));
-  },[]);
   return(
     <BrowserRouter>
     <Routes>

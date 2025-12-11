@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
-const API_BASE_URL='https://voting-system-aztp.onrender.com/api/v1';
+const API_BASE_URL='https://voting-system-m7jo.onrender.com/api/v1';
 
 export const api=axios.create({
     baseURL:API_BASE_URL,
@@ -29,7 +29,7 @@ api.interceptors.request.use(
 // api.interceptors.response.use(
 //     (response)=> response,
 //     (error)=>{
-//         if(error.response?.status===401){
+//         if(error.response?.status===403){
 //              const navigate=useNavigate();
 //             localStorage.removeItem('token');
 //             navigate('/login');

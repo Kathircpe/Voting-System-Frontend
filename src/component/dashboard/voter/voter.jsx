@@ -98,7 +98,7 @@ const [elections, setElections] = useState([]);
   //     return response.data;
   //   }
   // };
-  const API_BASE_URL = 'https://voting-system-aztp.onrender.com/api/v1/voter';
+  const API_BASE_URL = 'https://voting-system-m7jo.onrender.com/api/v1/voter';
 
 const apiCalls = {
   getVoterDetails: async (voterId) => {
