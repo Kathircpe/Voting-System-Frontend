@@ -34,15 +34,22 @@ const Admin = () => {
 
   // Form states
   const [electionForm, setElectionForm] = useState({
-    title: '', type: '', startDate: '', endDate: '', description: ''
+    id :'',electionName: '', startDate: '', endDate: ''
   });
   const [candidateForm, setCandidateForm] = useState({
-    name: '', party: '', electionId: '', position: '', bio: ''
+    name: '', partyName: '', id: '', constituency: ''
   });
+ 
   const [showElectionForm, setShowElectionForm] = useState(false);
   const [showCandidateForm, setShowCandidateForm] = useState(false);
   const [votersFormType, setVotersFormType] = useState(null);
 
+  const[showUpdateElection,setShowUpdateElection]=useState(false);
+  const[showDeleteElection,setShowDeleteElection]=useState(false);
+  const[showDeleteCandidate,setShowDeleteCandidate]=useState(false);
+  const[showUpdateCandidate,setShowUpdateCandidate]=useState(false);
+
+  
   // IDs for update/delete
   const [updateElectionId, setUpdateElectionId] = useState('');
   const [deleteElectionId, setDeleteElectionId] = useState('');
@@ -55,13 +62,13 @@ const Admin = () => {
   // Messages
   const [message, setMessage] = useState(null);
 
-  const API_BASE_URL = 'https://voting-system-aztp.onrender.com/api/v1/admin';
+  const API_BASE_URL = 'https://voting-system-m7jo.onrender.com/api/v1/admin';
 
   const apiCalls = {
     // Elections
     createElection: async (data) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/election`, {
+      const response = await fetch(`${API_BASE_URL}/createElection`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -72,10 +79,10 @@ const Admin = () => {
       return await response.json();
     },
 
-    updateElection: async (electionId, data) => {
+    updateElection: async (data) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/election/${electionId}`, {
-        method: 'PUT',
+      const response = await fetch(`${API_BASE_URL}/updateElection`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -87,7 +94,7 @@ const Admin = () => {
 
     deleteElection: async (electionId) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/election/${electionId}`, {
+      const response = await fetch(`${API_BASE_URL}/deleteElection/${electionId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -98,7 +105,7 @@ const Admin = () => {
 
     getAllElections: async () => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/election`, {
+      const response = await fetch(`https://voting-system-m7jo.onrender.com/api/v1/voter/election`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -112,7 +119,7 @@ const Admin = () => {
     // Candidates
     createCandidate: async (data) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/candidates`, {
+      const response = await fetch(`${API_BASE_URL}/createCandidate`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -125,8 +132,8 @@ const Admin = () => {
 
     updateCandidate: async (candidateId, data) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/candidates/${candidateId}`, {
-        method: 'PUT',
+      const response = await fetch(`${API_BASE_URL}/updateCandidate`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -138,7 +145,7 @@ const Admin = () => {
 
     deleteCandidate: async (candidateId) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/candidates/${candidateId}`, {
+      const response = await fetch(`${API_BASE_URL}/deleteCandidate/${candidateId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -149,7 +156,7 @@ const Admin = () => {
 
     getAllCandidates: async () => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/candidates`, {
+      const response = await fetch(`https://voting-system-m7jo.onrender.com/api/v1/voter/candidates`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -161,9 +168,9 @@ const Admin = () => {
     },
 
     // Voters
-    getAllVoters: async (page = 1, size = 10) => {
+    getAllVoters: async (page = 1) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/voters?page=${page}&size=${size}`, {
+      const response = await fetch(`${API_BASE_URL}/voters/${page}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -176,7 +183,7 @@ const Admin = () => {
 
     getVoterById: async (voterId) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/voters/${voterId}`, {
+      const response = await fetch(`${API_BASE_URL}/getVoter/${voterId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -189,7 +196,7 @@ const Admin = () => {
     // Votes
     getAllVotes: async (contractAddress) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/getVotes/${contractAddress}`, {
+      const response = await fetch(`${API_BASE_URL}/getVotesForAll/${contractAddress}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -199,9 +206,9 @@ const Admin = () => {
       return await response.json();
     },
 
-    getSingleCandidateVotes: async (contractAddress, candidateId) => {
+    getSingleCandidateVotes: async () => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/getVotes/${contractAddress}/${candidateId}`, {
+      const response = await fetch(`${API_BASE_URL}/getVotes`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -265,10 +272,17 @@ const Admin = () => {
     }
   };
 
+  const emptyElectionForm=()=>{
+      setElectionForm({id:'', electionName: '', startDate: '', endDate: '' });
+
+  }
+  function emptyCandidateForm(){
+    setCandidateForm({name: '', partyName: '', id: '', constituency: ''});
+  }
   // Election handlers
   const handleCreateElection = async (e) => {
     e.preventDefault();
-    if (!electionForm.title || !electionForm.type || !electionForm.startDate || !electionForm.endDate) {
+    if (!electionForm.electionName || !electionForm.startDate || !electionForm.endDate) {
       setMessage({ type: 'error', text: 'Please fill all required fields' });
       return;
     }
@@ -277,12 +291,12 @@ const Admin = () => {
       setLoading(true);
       await apiCalls.createElection(electionForm);
       setMessage({ type: 'success', text: 'Election created successfully!' });
-      setElectionForm({ title: '', type: '', startDate: '', endDate: '', description: '' });
-      setTimeout(() => setMessage(null), 5000);
+     emptyElectionForm();
+     setTimeout(() => setMessage(null), 5000);
       loadElections();
       setShowElectionForm(false);
     } catch (error) {
-      setMessage({ type: 'error', text: error.message || 'Failed to create election' });
+      setMessage({ type: 'error', text: error.response?.data || 'Failed to create election' });
     } finally {
       setLoading(false);
     }
@@ -290,42 +304,42 @@ const Admin = () => {
 
   const handleUpdateElection = async (e) => {
     e.preventDefault();
-    if (!updateElectionId) {
+    if (!electionForm.id) {
       setMessage({ type: 'error', text: 'Please enter Election ID' });
       return;
     }
 
     try {
       setLoading(true);
-      await apiCalls.updateElection(updateElectionId.trim(), electionForm);
-      setMessage({ type: 'success', text: `Election ${updateElectionId} updated successfully!` });
+      await apiCalls.updateElection( electionForm);
+      setMessage({ type: 'success', text: `Election ${electionForm.id} updated successfully!` });
       setUpdateElectionId('');
-      setElectionForm({ title: '', type: '', startDate: '', endDate: '', description: '' });
-      setTimeout(() => setMessage(null), 5000);
+     emptyElectionForm();
+     setTimeout(() => setMessage(null), 5000);
       loadElections();
     } catch (error) {
-      setMessage({ type: 'error', text: error.message || 'Failed to update election' });
+      setMessage({ type: 'error', text: error.response.data || 'Failed to update election' });
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteElection = async () => {
-    if (!deleteElectionId) {
+    if (!electionForm.id) {
       setMessage({ type: 'error', text: 'Please enter Election ID' });
       return;
     }
-    if (!window.confirm(`Delete election ${deleteElectionId}?`)) return;
+    if (!window.confirm(`Delete election ${electionForm.id}?`)) return;
 
     try {
       setLoading(true);
-      await apiCalls.deleteElection(deleteElectionId.trim());
-      setMessage({ type: 'success', text: `Election ${deleteElectionId} deleted!` });
-      setDeleteElectionId('');
+      await apiCalls.deleteElection(electionForm.id.trim());
+      setMessage({ type: 'success', text: `Election ${electionForm.id} deleted!` });
+     emptyElectionForm();
       setTimeout(() => setMessage(null), 5000);
       loadElections();
     } catch (error) {
-      setMessage({ type: 'error', text: error.message || 'Failed to delete election' });
+      setMessage({ type: 'error', text: error.response.data || 'Failed to delete election' });
     } finally {
       setLoading(false);
     }
@@ -334,7 +348,7 @@ const Admin = () => {
   // Candidate handlers
   const handleCreateCandidate = async (e) => {
     e.preventDefault();
-    if (!candidateForm.name || !candidateForm.party || !candidateForm.electionId) {
+    if (!candidateForm.name || !candidateForm.partyName || !candidateForm.electionId) {
       setMessage({ type: 'error', text: 'Please fill name, party, and election ID' });
       return;
     }
@@ -343,7 +357,7 @@ const Admin = () => {
       setLoading(true);
       await apiCalls.createCandidate(candidateForm);
       setMessage({ type: 'success', text: 'Candidate created successfully!' });
-      setCandidateForm({ name: '', party: '', electionId: '', position: '', bio: '' });
+      setCandidateForm({ name: '', partyName: '', electionId: '', constituency: '', bio: '' });
       setTimeout(() => setMessage(null), 5000);
       loadCandidates();
       setShowCandidateForm(false);
@@ -366,7 +380,7 @@ const Admin = () => {
       await apiCalls.updateCandidate(updateCandidateId.trim(), candidateForm);
       setMessage({ type: 'success', text: `Candidate ${updateCandidateId} updated successfully!` });
       setUpdateCandidateId('');
-      setCandidateForm({ name: '', party: '', electionId: '', position: '', bio: '' });
+      setCandidateForm({ name: '', partyName: '', electionId: '', constituency: '', bio: '' });
       setTimeout(() => setMessage(null), 5000);
       loadCandidates();
     } catch (error) {
@@ -419,7 +433,13 @@ const Admin = () => {
     try {
       setLoading(true);
       const data = await apiCalls.getVoterById(voterId.trim());
-      setVotersData([data]);
+      // Check if data is a valid voter object
+      if (data && data.id) {
+        setVotersData([data]);
+      } else {
+        setMessage({ type: 'error', text: 'Voter not found' });
+        setVotersData([]);
+      }
     } catch (error) {
       setMessage({ type: 'error', text: 'Voter not found' });
       setVotersData([]);
@@ -454,7 +474,7 @@ const Admin = () => {
     try {
       setLoading(true);
       const data = await apiCalls.getSingleCandidateVotes(contractAddress.trim(), candidateIdForVotes.trim());
-      setVotesData(Array.isArray(data) ? [data] : []);
+      setVotesData(Array.isArray(data) ? data : [data]);
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to fetch candidate votes' });
       setVotesData([]);
@@ -593,54 +613,55 @@ const Admin = () => {
               </button>
             </div>
 
-            {/* PERFECT CRUD BUTTONS */}
-<div className={styles.sectionCard}>
-  <h2 className={styles.sectionTitle}><span>⚡</span> Election Management</h2>
-  <div className={styles.crudBtnGroup}>
-    <button 
-      className={`${styles.btn} ${styles.crudCreateBtn}`} 
-      onClick={() => setShowElectionForm(true)}
-      disabled={loading}
-    >
-      ➕ Create Election
-    </button>
-    <button 
-      className={`${styles.btn} ${styles.crudUpdateBtn}`} 
-      onClick={() => setUpdateElectionId('')}
-      disabled={loading}
-    >
-      ✏️ Update Election
-    </button>
-    <button 
-      className={`${styles.btn} ${styles.crudDeleteBtn}`} 
-      onClick={() => setDeleteElectionId('')}
-      disabled={loading}
-    >
-      🗑️ Delete Election
-    </button>
-    <button 
-      className={`${styles.btn} ${styles.crudRefreshBtn}`} 
-      onClick={loadElections}
-      disabled={loading}
-    >
-      🔄 Refresh
-    </button>
-  </div>
-</div>
-
+            {/* CRUD BUTTONS */}
+            <div className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}><span>⚡</span> Election Management</h2>
+              <div className={styles.crudBtnGroup}>
+                <button 
+                  className={`${styles.btn} ${styles.crudCreateBtn}`} 
+                  onClick={() => setShowElectionForm(true)}
+                  disabled={loading}
+                >
+                  ➕ Create Election
+                </button>
+                <button 
+                  className={`${styles.btn} ${styles.crudUpdateBtn}`} 
+                  onClick={() => setShowUpdateElection(true)}
+                  disabled={loading}
+                >
+                  ✏️ Update Election
+                </button>
+                <button 
+                  className={`${styles.btn} ${styles.crudDeleteBtn}`} 
+                  onClick={() => setShowDeleteElection(true)}
+                  disabled={loading}
+                >
+                  🗑️ Delete Election
+                </button>
+                <button 
+                  className={`${styles.btn} ${styles.crudRefreshBtn}`} 
+                  onClick={loadElections}
+                  disabled={loading}
+                >
+                  🔄 Refresh
+                </button>
+              </div>
+            </div>
 
             {/* Elections List */}
             {!loading && elections.length > 0 && (
               <div className={styles.sectionCard}>
+                <br></br>
+                <br></br>
                 <h2 className={styles.sectionTitle}><span>🗳️</span> Elections List</h2>
                 <div className={styles.dataTable}>
                   <table>
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Status</th>
+                        <th>Election Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
                         <th>Contract</th>
                       </tr>
                     </thead>
@@ -648,10 +669,10 @@ const Admin = () => {
                       {elections.map((election, idx) => (
                         <tr key={idx}>
                           <td>{election.id || idx}</td>
-                          <td>{election.title}</td>
-                          <td>{election.type}</td>
-                          <td><span className={`${styles.badge} ${styles.badgeSuccess}`}>{election.status || 'Active'}</span></td>
-                          <td>{election.contractAddress?.slice(0, 10)}...</td>
+                          <td>{election.electionName}</td>
+                          <td>{`${election.startDate.slice(0,10)}  ${election.startDate.slice(11)}`}</td>
+                          <td>{`${election.endDate.slice(0,10)}  ${election.endDate.slice(11)}`}</td>
+                          <td>{election.contractAddress}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -659,83 +680,26 @@ const Admin = () => {
                 </div>
               </div>
             )}
-            {/* UPDATE ELECTION */}
-{updateElectionId !== '' && (
-  <div className={styles.sectionCard}>
-    <h3 className={styles.formTitle}>✏️ Update Election</h3>
-    <input 
-      type="text" 
-      className={styles.updateIdInput}
-      placeholder="Enter Election ID (e.g., 1)"
-      value={updateElectionId}
-      onChange={(e) => setUpdateElectionId(e.target.value)}
-    />
-    <div className={styles.crudBtnGroup}>
-      <button 
-        className={`${styles.btn} ${styles.crudUpdateBtn}`} 
-        onClick={handleUpdateElection}
-        disabled={loading || !updateElectionId.trim()}
-      >
-        Update Election
-      </button>
-    </div>
-  </div>
-)}
 
-{/* DELETE ELECTION */}
-{deleteElectionId !== '' && (
-  <div className={styles.deleteConfirmSection}>
-    <h3 className={styles.formTitle}>🗑️ Delete Election</h3>
-    <input 
-      type="text" 
-      className={styles.deleteIdInput}
-      placeholder="Enter Election ID to Delete"
-      value={deleteElectionId}
-      onChange={(e) => setDeleteElectionId(e.target.value)}
-    />
-    <div className={styles.crudBtnGroup}>
-      <button 
-        className={`${styles.btn} ${styles.crudDeleteBtn}`} 
-        onClick={handleDeleteElection}
-        disabled={loading || !deleteElectionId.trim()}
-      >
-        ⚠️ Confirm Delete
-      </button>
-    </div>
-  </div>
-)}
-
-
-            {/* Election Forms */}
+             {/* Election Forms */}
             {showElectionForm && (
               <div className={styles.inputForm}>
                 <h3 className={styles.formTitle}><span>➕</span> Create New Election</h3>
                 <form onSubmit={handleCreateElection}>
                   <div className={styles.formRow}>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Title *</label>
+                      <label className={styles.inputLabel}>Election Name</label>
                       <input
                         type="text"
                         className={styles.inputField}
-                        value={electionForm.title}
-                        onChange={(e) => setElectionForm({...electionForm, title: e.target.value})}
-                        placeholder="Election title"
-                        required
-                      />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Type *</label>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        value={electionForm.type}
-                        onChange={(e) => setElectionForm({...electionForm, type: e.target.value})}
+                        value={electionForm.electionName}
+                        onChange={(e) => setElectionForm({...electionForm, electionName: e.target.value})}
                         placeholder="Presidential, Local, etc."
                         required
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Start Date *</label>
+                      <label className={styles.inputLabel}>Start Date</label>
                       <input
                         type="datetime-local"
                         className={styles.inputField}
@@ -745,7 +709,7 @@ const Admin = () => {
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>End Date *</label>
+                      <label className={styles.inputLabel}>End Date</label>
                       <input
                         type="datetime-local"
                         className={styles.inputField}
@@ -755,16 +719,7 @@ const Admin = () => {
                       />
                     </div>
                   </div>
-                  <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Description</label>
-                    <textarea
-                      className={styles.inputField}
-                      value={electionForm.description}
-                      onChange={(e) => setElectionForm({...electionForm, description: e.target.value})}
-                      placeholder="Election description"
-                    />
-                  </div>
-                  <div className={styles.btnGroup}>
+                  <div className={styles.crudBtnGroup}>
                     <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading}>
                       {loading ? 'Creating...' : 'Create Election'}
                     </button>
@@ -775,10 +730,103 @@ const Admin = () => {
                 </form>
               </div>
             )}
+            {/* UPDATE ELECTION */}
+            {showUpdateElection && (
+              <div className={styles.sectionCard}>
+                <h3 className={styles.formTitle}>✏️ Update Election</h3>
+                <input 
+                  type="text" 
+                  className={styles.inputField}
+                  placeholder="Enter Election ID (e.g., 1)"
+                  value={electionForm.id}
+                  onChange={(e) =>setElectionForm({...electionForm, id: e.target.value})}
+                />
+                
+                <div className={styles.formRow}>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>Election Name</label>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={electionForm.electionName}
+                      onChange={(e) => setElectionForm({...electionForm, electionName: e.target.value})}
+                      placeholder="Presidential, Local, etc."
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>Start Date</label>
+                    <input
+                      type="datetime-local"
+                      className={styles.inputField}
+                      value={electionForm.startDate}
+                      onChange={(e) => setElectionForm({...electionForm, startDate: e.target.value})}
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>End Date</label>
+                    <input
+                      type="datetime-local"
+                      className={styles.inputField}
+                      value={electionForm.endDate}
+                      onChange={(e) => setElectionForm({...electionForm, endDate: e.target.value})}
+                    />
+                  </div>
+                </div>
+                
+                <div className={styles.crudBtnGroup}>
+                  <button 
+                    className={`${styles.btn} ${styles.crudUpdateBtn}`} 
+                    onClick={handleUpdateElection}
+                    disabled={loading || !electionForm.id.trim()}
+                  >
+                    Update Election
+                  </button>
+                  <button 
+                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                    onClick={() => setShowUpdateElection(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* DELETE ELECTION */}
+            {showDeleteElection && (
+              <div className={styles.deleteConfirmSection}>
+                <h3 className={styles.formTitle}>🗑️ Delete Election</h3>
+                <input 
+                  type="text" 
+                  className={styles.deleteIdInput}
+                  placeholder="Enter Election ID to Delete"
+                  value={electionForm.id}
+                  onChange={(e) => setElectionForm({...electionForm, id: e.target.value})}
+                />
+                <div className={styles.crudBtnGroup}>
+                  <button 
+                    className={`${styles.btn} ${styles.crudDeleteBtn}`} 
+                    onClick={handleDeleteElection}
+                    disabled={loading || !electionForm.id.trim()}
+                  >
+                    ⚠️ Confirm Delete
+                  </button>
+                  <button 
+                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                    onClick={() => setShowDeleteElection(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Candidates - Similar pattern */}
+            
+
+           
+
+        {/* Candidates */}
         {currentSection === 'candidates' && (
           <div>
             <div className={styles.pageHeader}>
@@ -792,24 +840,23 @@ const Admin = () => {
               </button>
             </div>
 
-           <div className={styles.sectionCard}>
-  <h2 className={styles.sectionTitle}><span>⚡</span> Candidate Management</h2>
-  <div className={styles.crudBtnGroup}>
-    <button className={`${styles.btn} ${styles.crudCreateBtn}`} onClick={() => setShowCandidateForm(true)}>
-      ➕ Create Candidate
-    </button>
-    <button className={`${styles.btn} ${styles.crudUpdateBtn}`} onClick={() => setUpdateCandidateId('')}>
-      ✏️ Update Candidate
-    </button>
-    <button className={`${styles.btn} ${styles.crudDeleteBtn}`} onClick={() => setDeleteCandidateId('')}>
-      🗑️ Delete Candidate
-    </button>
-    <button className={`${styles.btn} ${styles.crudRefreshBtn}`} onClick={loadCandidates}>
-      🔄 Refresh
-    </button>
-  </div>
-</div>
-
+            <div className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}><span>⚡</span> Candidate Management</h2>
+              <div className={styles.crudBtnGroup}>
+                <button className={`${styles.btn} ${styles.crudCreateBtn}`} onClick={() => setShowCandidateForm(true)}>
+                  ➕ Create Candidate
+                </button>
+                <button className={`${styles.btn} ${styles.crudUpdateBtn}`} onClick={() => setUpdateCandidateId(' ')}>
+                  ✏️ Update Candidate
+                </button>
+                <button className={`${styles.btn} ${styles.crudDeleteBtn}`} onClick={() => setDeleteCandidateId(' ')}>
+                  🗑️ Delete Candidate
+                </button>
+                <button className={`${styles.btn} ${styles.crudRefreshBtn}`} onClick={loadCandidates}>
+                  🔄 Refresh
+                </button>
+              </div>
+            </div>
 
             {/* Candidates List */}
             {!loading && candidates.length > 0 && (
@@ -821,9 +868,8 @@ const Admin = () => {
                       <tr>
                         <th>ID</th>
                         <th>Name</th>
+                        <th>Constituency</th>
                         <th>Party</th>
-                        <th>Election</th>
-                        <th>Position</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -831,9 +877,8 @@ const Admin = () => {
                         <tr key={idx}>
                           <td>{candidate.id || idx}</td>
                           <td>{candidate.name}</td>
-                          <td>{candidate.party}</td>
-                          <td>{candidate.electionId}</td>
-                          <td>{candidate.position}</td>
+                          <td>{candidate.constituency}</td>
+                          <td>{candidate.partyName}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -841,15 +886,14 @@ const Admin = () => {
                 </div>
               </div>
             )}
-
-            {/* Candidate Forms */}
+             {/* Candidate Forms */}
             {showCandidateForm && (
               <div className={styles.inputForm}>
                 <h3 className={styles.formTitle}><span>➕</span> Create New Candidate</h3>
                 <form onSubmit={handleCreateCandidate}>
                   <div className={styles.formRow}>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Name *</label>
+                      <label className={styles.inputLabel}>Name</label>
                       <input
                         type="text"
                         className={styles.inputField}
@@ -860,47 +904,29 @@ const Admin = () => {
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Party *</label>
+                      <label className={styles.inputLabel}>Party</label>
                       <input
                         type="text"
                         className={styles.inputField}
-                        value={candidateForm.party}
-                        onChange={(e) => setCandidateForm({...candidateForm, party: e.target.value})}
+                        value={candidateForm.partyName}
+                        onChange={(e) => setCandidateForm({...candidateForm, partyName: e.target.value})}
                         placeholder="Political party"
                         required
                       />
                     </div>
+    
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Election ID *</label>
+                      <label className={styles.inputLabel}>Constituency</label>
                       <input
                         type="text"
                         className={styles.inputField}
-                        value={candidateForm.electionId}
-                        onChange={(e) => setCandidateForm({...candidateForm, electionId: e.target.value})}
-                        placeholder="Election ID"
-                        required
-                      />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Position</label>
-                      <input
-                        type="text"
-                        className={styles.inputField}
-                        value={candidateForm.position}
-                        onChange={(e) => setCandidateForm({...candidateForm, position: e.target.value})}
-                        placeholder="President, VP, etc."
+                        value={candidateForm.constituency}
+                        onChange={(e) => setCandidateForm({...candidateForm, constituency: e.target.value})}
+                        placeholder="constituency"
                       />
                     </div>
                   </div>
-                  <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Bio</label>
-                    <textarea
-                      className={styles.inputField}
-                      value={candidateForm.bio}
-                      onChange={(e) => setCandidateForm({...candidateForm, bio: e.target.value})}
-                      placeholder="Candidate biography"
-                    />
-                  </div>
+                 
                   <div className={styles.btnGroup}>
                     <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading}>
                       {loading ? 'Creating...' : 'Create Candidate'}
@@ -912,6 +938,100 @@ const Admin = () => {
                 </form>
               </div>
             )}
+
+            {/* UPDATE CANDIDATE */}
+            {showUpdateCandidate && (
+              <div className={styles.sectionCard}>
+                <h3 className={styles.formTitle}>✏️ Update Candidate</h3>
+                <input 
+                  type="text" 
+                  className={styles.updateIdInput}
+                  placeholder="Enter Candidate ID (e.g., 1)"
+                  value={candidateForm.id}
+                  onChange={(e) =>  setCandidateForm({...candidateForm, id: e.target.value})}
+                />
+                
+                <div className={styles.formRow}>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>Name</label>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={candidateForm.name}
+                      onChange={(e) => setCandidateForm({...candidateForm, name: e.target.value})}
+                      placeholder="Candidate full name"
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>Party</label>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={candidateForm.partyName}
+                      onChange={(e) => setCandidateForm({...candidateForm, partyName: e.target.value})}
+                      placeholder="Political party"
+                    />
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label className={styles.inputLabel}>Constituency</label>
+                    <input
+                      type="text"
+                      className={styles.inputField}
+                      value={candidateForm.constituency}
+                      onChange={(e) => setCandidateForm({...candidateForm, constituency: e.target.value})}
+                      placeholder="President, VP, etc."
+                    />
+                  </div>
+                </div>
+                
+                <div className={styles.crudBtnGroup}>
+                  <button 
+                    className={`${styles.btn} ${styles.crudUpdateBtn}`} 
+                    onClick={handleUpdateCandidate}
+                    disabled={loading || !candidateForm.id.trim()}
+                  >
+                    Update Candidate
+                  </button>
+                  <button 
+                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                    onClick={() => setShowUpdateCandidate(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* DELETE CANDIDATE */}
+            {showDeleteCandidate && (
+              <div className={styles.deleteConfirmSection}>
+                <h3 className={styles.formTitle}>🗑️ Delete Candidate</h3>
+                <input 
+                  type="text" 
+                  className={styles.deleteIdInput}
+                  placeholder="Enter Candidate ID to Delete"
+                  value={candidateForm.id}
+                  onChange={(e) => setCandidateForm({...candidateForm, id: e.target.value})}
+                />
+                <div className={styles.crudBtnGroup}>
+                  <button 
+                    className={`${styles.btn} ${styles.crudDeleteBtn}`} 
+                    onClick={handleDeleteCandidate}
+                    disabled={loading || !deleteCandidateId.trim()}
+                  >
+                    ⚠️ Confirm Delete
+                  </button>
+                  <button 
+                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                    onClick={() => setShowDeleteCandidate(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
@@ -1101,7 +1221,9 @@ const Admin = () => {
         )}
       </main>
 
-      {sidebarOpen && <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && (
+        <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
+      )}
     </div>
   );
 };

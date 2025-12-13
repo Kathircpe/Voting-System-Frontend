@@ -48,7 +48,7 @@ const [elections, setElections] = useState([]);
 
   // Vote Form State
   const [voteForm, setVoteForm] = useState({
-    contractAddress: '',
+    id: '',
     candidateId: '',
     confirmCandidateId: ''
   });
@@ -153,9 +153,9 @@ const apiCalls = {
     return await response.json();
   },
 
-  getVoteResults: async (contractAddress) => {
+  getVoteResults: async (electionId) => {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/getVotes/${contractAddress.trim()}`, {
+    const response = await fetch(`${API_BASE_URL}/getVotes/${electionId.trim()}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -775,13 +775,13 @@ const loadElections = async () => {
               </div>
 
               <form onSubmit={handleCastVote}>
-                <label className={styles.label}>Contract Address *</label>
+                <label className={styles.label}>id</label>
                 <input
                   type="text"
                   className={styles.inputField}
-                  placeholder="Enter election contract address"
-                  value={voteForm.contractAddress}
-                  onChange={(e) => setVoteForm({ ...voteForm, contractAddress: e.target.value })}
+                  placeholder="Enter election id"
+                  value={voteForm.id}
+                  onChange={(e) => setVoteForm({ ...voteForm, id: e.target.value })}
                   required
                 />
 
@@ -795,12 +795,12 @@ const loadElections = async () => {
                   <option value="">Choose a candidate...</option>
                   {candidates.map((c) => (
                     <option key={c.candidateId} value={c.candidateId}>
-                     {c.id} - {c.name} - {c.party}
+                     {c.id} - {c.name} - {c.partyName}
                     </option>
                   ))}
                 </select>
 
-                <label className={styles.label}>Confirm Your Choice *</label>
+                {/* <label className={styles.label}>Confirm Your Choice *</label> */}
                 <input
                   type="text"
                   className={styles.inputField}
@@ -820,7 +820,7 @@ const loadElections = async () => {
                   <button 
                     type="button" 
                     className={`${styles.btn} ${styles.btnSecondary}`}
-                    onClick={() => setVoteForm({ contractAddress: '', candidateId: '', confirmCandidateId: '' })}
+                    onClick={() => setVoteForm({ id: '', candidateId: '', confirmCandidateId: '' })}
                   >
                     ✗ Cancel
                   </button>
@@ -852,7 +852,7 @@ const loadElections = async () => {
               <input
                 type="text"
                 className={styles.inputField}
-                placeholder="Enter election contract address"
+                placeholder="Enter election id"
                 value={resultsContract}
                 onChange={(e) => setResultsContract(e.target.value)}
               />
@@ -995,7 +995,7 @@ const loadElections = async () => {
                     />
                   </div>
                   <div>
-                    <label className={styles.label}>Age </label>
+                    <label className={styles.label}></label>
                     <input
                       type="number"
                       className={styles.inputField}
