@@ -267,7 +267,7 @@ const Voter = () => {
       setTimeout(() => setVoteMessage(null), 7000);
       setMessage(null);
     } catch (error) {
-      setVoteMessage({ type: 'error', text: error?.response?.data || 'Failed to cast vote. Please try again.' });
+      setVoteMessage({ type: 'error', text: error.response.data || 'Failed to cast vote. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -688,7 +688,7 @@ const Voter = () => {
       <div className={styles.loadingText}>Loading elections...</div>
     ) : (
       <div className={styles.electionsGrid}>
-        {elections.map((election, idx) => (
+        {elections.sort((a,b)=>a.id-b.id).map((election, idx) => (
           <div key={idx} className={styles.electionCard}>
             <div className={styles.electionHeader}>
               <div className={styles.electionTitle}>{election.title}</div>
@@ -699,17 +699,16 @@ const Voter = () => {
 
             <div className={styles.electionBody}>
               <div className={styles.electionMeta}>
-                 <span>ID: {election.id}</span>
-                <span>Contract: {election.contractAddress.slice(0,16)}..</span>
+                <span>ID: {election.id}</span><br />
+                <span>Contract: {election.contractAddress.slice(0,16)}..</span><br />
                 <span>Type: {election.electionName}</span>
               </div>
+
               <div className={styles.electionDates}>
                 <span>Starts: {new Date(election.startDate).toLocaleString()}</span>
                 <span>Ends: {new Date(election.endDate).toLocaleString()}</span>
               </div>
-              {election.description && (
-                <p className={styles.electionDescription}>{election.description}</p>
-              )}
+              
             </div>
           </div>
         ))}
@@ -744,7 +743,7 @@ const Voter = () => {
               <div className={styles.loadingText}>Loading candidates...</div>
             ) : (
               <div className={styles.candidatesGrid}>
-                {candidates.map((candidate, idx) => (
+                {candidates.sort((a,b)=>a.id-b.id).map((candidate, idx) => (
                   <div key={idx} className={styles.candidateCard}>
                     <div className={styles.candidateHeader}>
                       <div className={styles.candidateAvatar}>
@@ -752,7 +751,9 @@ const Voter = () => {
                       </div>
                       <div>
                         <div className={styles.candidateName}>{candidate.name}</div>
-                        <div className={styles.candidateParty}>{candidate.party}</div>
+                        <div className={styles.candidateParty}>party : {candidate.partyName}</div>
+                        <div className={styles.candidateParty}>constituency : {candidate.constituency}</div>
+
                       </div>
                     </div>
                     <div className={styles.candidateBody}>
@@ -761,7 +762,7 @@ const Voter = () => {
                           {candidate.position}
                         </span>
                         <span className={`${styles.badge} ${styles.badgeInfo}`}>
-                          ID: {candidate.candidateId}
+                          ID: {candidate.id}
                         </span>
                       </div>
                       <div className={styles.candidateBio}>{candidate.bio}</div>
@@ -801,7 +802,7 @@ const Voter = () => {
               </div>
 
               <form onSubmit={handleCastVote}>
-                <label className={styles.label}>id</label>
+                {/* <label className={styles.label}>id</label> */}
                 <input
                   type="text"
                   className={styles.inputField}
@@ -810,8 +811,8 @@ const Voter = () => {
                   onChange={(e) => setVoteForm({ ...voteForm, id: e.target.value })}
                   required
                 />
-{/* 
-                <label className={styles.label}>Select Candidate *</label> */}
+ 
+                {/* <label className={styles.label}>Select Candidate *</label> */}
                 <select
                   className={styles.inputField}
                   value={voteForm.candidateId}
@@ -892,68 +893,90 @@ const Voter = () => {
               </button>
             </div>
 
-            {results.length > 0 && (
-              <>
-                <div className={styles.tableContainer}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th>Rank</th>
-                        <th>Candidate</th>
-                        <th>Party</th>
-                        <th>Votes</th>
-                        <th>Percentage</th>
-                        <th>Progress</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {results.map((result, index) => {
-                        const totalVotes = results.reduce((sum, r) => sum + r.votes, 0);
-                        const percentage = ((result.votes / totalVotes) * 100).toFixed(1);
-                        return (
-                          <tr key={index}>
-                            <td><strong>#{index + 1}</strong></td>
-                            <td><strong>{result.name}</strong></td>
-                            <td>{result.partyName}</td>
-                            <td><strong className={styles.voteCount}>{result.votes.toLocaleString()}</strong></td>
-                            <td>
-                              <span className={`${styles.badge} ${styles.badgeInfo}`}>{percentage}%</span>
-                            </td>
-                            <td>
-                              <div className={styles.progressBar}>
-                                <div 
-                                  className={styles.progressFill} 
-                                  style={{width: `${percentage}%`}}
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+          {results.length > 0 && (
+         <>
+          {(() => {
+            // flatten: [{ name, votes }]
+            const parsed = results.map((r) => {
+              const [key, value] = Object.entries(r)[0];
+              return { name: key, votes: value };
+              });
 
-                <div className={styles.infoCard}>
-                  <div className={styles.infoRow}>
-                    <span className={styles.infoLabel}>Total Votes Cast</span>
-                    <span className={`${styles.infoValue} ${styles.infoValueLarge}`}>
-                      {results.reduce((sum, r) => sum + r.votes, 0).toLocaleString()}
-                    </span>
+              const totalVotes = parsed.reduce((sum, r) => sum + r.votes, 0);
+              const sorted = [...parsed].sort((a, b) => b.votes - a.votes);
+
+              return (
+                <>
+                  <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <th>Rank</th>
+                          <th>Candidate</th>
+                          <th>Votes</th>
+                          <th>Percentage</th>
+                          <th>Progress</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sorted.map((row, index) => {
+                          const percentage =
+                            totalVotes > 0
+                              ? ((row.votes / totalVotes) * 100).toFixed(1)
+                              : 0;
+
+                          return (
+                            <tr key={row.name}>
+                              <td><strong>#{index + 1}</strong></td>
+                              <td><strong>{row.name}</strong></td>
+                              <td>{row.votes}</td>
+                              <td>
+                                <span className={`${styles.badge} ${styles.badgeInfo}`}>
+                                  {percentage}%
+                                </span>
+                              </td>
+                              <td>
+                                <div className={styles.progressBar}>
+                                  <div
+                                    className={styles.progressFill}
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
-                  <div className={styles.infoRow}>
-                    <span className={styles.infoLabel}>Leading Candidate</span>
-                    <span className={styles.infoValue}>
-                      {results[0].name} ({results[0].party})
-                    </span>
+
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>Total Votes Cast</span>
+                      <span className={`${styles.infoValue} ${styles.infoValueLarge}`}>
+                        {totalVotes.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>Leading Candidate</span>
+                      <span className={styles.infoValue}>
+                        {sorted[0]?.name || 'N/A'}
+                      </span>
+                    </div>
+                    <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
+                      <span className={styles.infoLabel}>Election Status</span>
+                      <span className={`${styles.badge} ${styles.badgeSuccess}`}>
+                        In Progress
+                      </span>
+                    </div>
                   </div>
-                  <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
-                    <span className={styles.infoLabel}>Election Status</span>
-                    <span className={`${styles.badge} ${styles.badgeSuccess}`}>In Progress</span>
-                  </div>
-                </div>
-              </>
-            )}
+                </>
+              );
+            })()}
+            </>
+           )}
+
+
           </div>
         )}
 
@@ -975,18 +998,17 @@ const Voter = () => {
               </div>
 
               <form onSubmit={handleUpdateProfile}>
-                <label className={styles.label}>Voter ID (Cannot be changed)</label>
-                <input
+                {/* <label className={styles.label}>Voter ID (Cannot be changed)</label> */}
+                {/* <input
                   type="text"
                   className={`${styles.inputField} ${styles.inputFieldDisabled}`}
                   value={user.id}
-
                   disabled
-                />
+                /> */}
 
                 <div className={styles.formRow}>
                   <div>
-                    <label className={styles.label}>Full Name </label>
+                    {/* <label className={styles.label}>Full Name </label> */}
                     <input
                       type="text"
                       className={styles.inputField}
@@ -1033,7 +1055,7 @@ const Voter = () => {
                   </div>
                 </div>
 
-                <label className={styles.label}>Voter Address </label>
+                {/* <label className={styles.label}>Voter Address </label> */}
                 <textarea
                   className={`${styles.inputField} ${styles.textArea}`}
                   placeholder="Enter your voterAddress..."

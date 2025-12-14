@@ -56,7 +56,7 @@ const Admin = () => {
   const [updateCandidateId, setUpdateCandidateId] = useState('');
   const [deleteCandidateId, setDeleteCandidateId] = useState('');
   const [voterId, setVoterId] = useState('');
-  const [contractAddress, setContractAddress] = useState('');
+  const [electionId, setElectionId] = useState('');
   const [candidateIdForVotes, setCandidateIdForVotes] = useState('');
 
   // Messages
@@ -127,10 +127,10 @@ const Admin = () => {
         },
         body: JSON.stringify(data)
       });
-      return await response.json();
+      return await response;
     },
 
-    updateCandidate: async (candidateId, data) => {
+    updateCandidate: async (data) => {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/updateCandidate`, {
         method: 'PATCH',
@@ -140,7 +140,7 @@ const Admin = () => {
         },
         body: JSON.stringify(data)
       });
-      return await response.json();
+      return await response;
     },
 
     deleteCandidate: async (candidateId) => {
@@ -151,7 +151,7 @@ const Admin = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      return await response.json();
+      return await response;
     },
 
     getAllCandidates: async () => {
@@ -168,9 +168,9 @@ const Admin = () => {
     },
 
     // Voters
-    getAllVoters: async (page = 1) => {
+    getAllVoters: async (page) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/voters/${page}`, {
+      const response = await fetch(`${API_BASE_URL}/getVoters/${page-1}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -194,9 +194,9 @@ const Admin = () => {
     },
 
     // Votes
-    getAllVotes: async (contractAddress) => {
+    getAllVotes: async (electionId) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/getVotesForAll/${contractAddress}`, {
+      const response = await fetch(`${API_BASE_URL}/getVotesForAll/${electionId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -348,21 +348,21 @@ const Admin = () => {
   // Candidate handlers
   const handleCreateCandidate = async (e) => {
     e.preventDefault();
-    if (!candidateForm.name || !candidateForm.partyName || !candidateForm.electionId) {
-      setMessage({ type: 'error', text: 'Please fill name, party, and election ID' });
+    if (!candidateForm.name || !candidateForm.partyName || !candidateForm.constituency) {
+      setMessage({ type: 'error', text: 'Please fill name, party, and constituency' });
       return;
     }
 
     try {
       setLoading(true);
-      await apiCalls.createCandidate(candidateForm);
+      const response =await apiCalls.createCandidate(candidateForm);
       setMessage({ type: 'success', text: 'Candidate created successfully!' });
-      setCandidateForm({ name: '', partyName: '', electionId: '', constituency: '', bio: '' });
+      setCandidateForm({id:'', name: '', partyName: '', constituency: '' });
       setTimeout(() => setMessage(null), 5000);
       loadCandidates();
       setShowCandidateForm(false);
     } catch (error) {
-      setMessage({ type: 'error', text: error.message || 'Failed to create candidate' });
+      setMessage({ type: 'error', text: error.response?.data || 'Failed to create candidate' });
     } finally {
       setLoading(false);
     }
@@ -370,17 +370,25 @@ const Admin = () => {
 
   const handleUpdateCandidate = async (e) => {
     e.preventDefault();
-    if (!updateCandidateId) {
+    if (!candidateForm.id) {
       setMessage({ type: 'error', text: 'Please enter Candidate ID' });
       return;
     }
+    if(!candidateForm.name&&!candidateForm.partyName&&!candidateForm.constituency){
+      setMessage({ type: 'error', text: 'Please enter atleast one detail' });
+      return;
+    }
 
+    let data={id:candidateForm.id};
+      if(candidateForm.name) data.name = candidateForm.name;
+      if(candidateForm.partyName) data.partyName = candidateForm.partyName;
+      if(candidateForm.constituency) data.constituency = candidateForm.constituency;
     try {
       setLoading(true);
-      await apiCalls.updateCandidate(updateCandidateId.trim(), candidateForm);
-      setMessage({ type: 'success', text: `Candidate ${updateCandidateId} updated successfully!` });
+      await apiCalls.updateCandidate(data);
+      setMessage({ type: 'success', text: `Candidate ${data.id} updated successfully!` });
       setUpdateCandidateId('');
-      setCandidateForm({ name: '', partyName: '', electionId: '', constituency: '', bio: '' });
+      setCandidateForm({ id:'',name: '', partyName: '',constituency: '' });
       setTimeout(() => setMessage(null), 5000);
       loadCandidates();
     } catch (error) {
@@ -405,7 +413,7 @@ const Admin = () => {
       setTimeout(() => setMessage(null), 5000);
       loadCandidates();
     } catch (error) {
-      setMessage({ type: 'error', text: error.message || 'Failed to delete candidate' });
+      setMessage({ type: 'error', text: error.reponse.data || 'Failed to delete candidate' });
     } finally {
       setLoading(false);
     }
@@ -415,7 +423,7 @@ const Admin = () => {
   const handleGetAllVoters = async () => {
     try {
       setLoading(true);
-      const data = await apiCalls.getAllVoters(currentPage, votersPageSize);
+      const data = await apiCalls.getAllVoters(currentPage);
       setVotersData(Array.isArray(data) ? data : []);
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to fetch voters' });
@@ -450,16 +458,16 @@ const Admin = () => {
 
   // Vote handlers
   const handleGetAllVotes = async () => {
-    if (!contractAddress.trim()) {
-      setMessage({ type: 'error', text: 'Please enter contract address' });
+    if (!electionId.trim()) {
+      setMessage({ type: 'error', text: 'Please enter election Id' });
       return;
     }
     try {
       setLoading(true);
-      const data = await apiCalls.getAllVotes(contractAddress.trim());
+      const data = await apiCalls.getAllVotes(electionId.trim());
       setVotesData(Array.isArray(data) ? data : []);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to fetch votes' });
+      setMessage({ type: 'error', text: error.response?.data||'failed to fetch' });
       setVotesData([]);
     } finally {
       setLoading(false);
@@ -467,16 +475,16 @@ const Admin = () => {
   };
 
   const handleGetSingleVotes = async () => {
-    if (!contractAddress.trim() || !candidateIdForVotes.trim()) {
+    if (!electionId.trim() || !candidateIdForVotes.trim()) {
       setMessage({ type: 'error', text: 'Please fill all fields' });
       return;
     }
     try {
       setLoading(true);
-      const data = await apiCalls.getSingleCandidateVotes(contractAddress.trim(), candidateIdForVotes.trim());
+      const data = await apiCalls.getSingleCandidateVotes(electionId.trim(), candidateIdForVotes.trim());
       setVotesData(Array.isArray(data) ? data : [data]);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to fetch candidate votes' });
+      setMessage({ type: 'error', text: eroor.repomse.data|| 'Failed to fetch candidate votes' });
       setVotesData([]);
     } finally {
       setLoading(false);
@@ -651,11 +659,15 @@ const Admin = () => {
             {/* Elections List */}
             {!loading && elections.length > 0 && (
               <div className={styles.sectionCard}>
-                <br></br>
-                <br></br>
-                <h2 className={styles.sectionTitle}><span>🗳️</span> Elections List</h2>
+                <br />
+                <br />
+                <h2 className={styles.sectionTitle}>
+                  <span>🗳️</span> Elections List
+                </h2>
+
+                {/* responsive wrapper */}
                 <div className={styles.dataTable}>
-                  <table>
+                  <table className={styles.responsiveTable}>
                     <thead>
                       <tr>
                         <th>ID</th>
@@ -666,13 +678,19 @@ const Admin = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {elections.map((election, idx) => (
+                      {elections.sort((a,b)=>a.id-b.id).map((election, idx) => (
                         <tr key={idx}>
                           <td>{election.id || idx}</td>
                           <td>{election.electionName}</td>
-                          <td>{`${election.startDate.slice(0,10)}  ${election.startDate.slice(11)}`}</td>
-                          <td>{`${election.endDate.slice(0,10)}  ${election.endDate.slice(11)}`}</td>
-                          <td style={{fontSize:"12px"}}>{election.contractAddress}</td>
+                          <td>
+                            {`${election.startDate.slice(0, 10)}  ${election.startDate.slice(11)}`}
+                          </td>
+                          <td>
+                            {`${election.endDate.slice(0, 10)}  ${election.endDate.slice(11)}`}
+                          </td>
+                          <td className={styles.contractCell}>
+                            {election.contractAddress}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -822,10 +840,6 @@ const Admin = () => {
           </div>
         )}
 
-            
-
-           
-
         {/* Candidates */}
         {currentSection === 'candidates' && (
           <div>
@@ -846,10 +860,10 @@ const Admin = () => {
                 <button className={`${styles.btn} ${styles.crudCreateBtn}`} onClick={() => setShowCandidateForm(true)}>
                   ➕ Create Candidate
                 </button>
-                <button className={`${styles.btn} ${styles.crudUpdateBtn}`} onClick={() => setUpdateCandidateId(' ')}>
+                <button className={`${styles.btn} ${styles.crudUpdateBtn}`} onClick={() => setShowUpdateCandidate(true)}>
                   ✏️ Update Candidate
                 </button>
-                <button className={`${styles.btn} ${styles.crudDeleteBtn}`} onClick={() => setDeleteCandidateId(' ')}>
+                <button className={`${styles.btn} ${styles.crudDeleteBtn}`} onClick={() => setDeleteCandidate(true)}>
                   🗑️ Delete Candidate
                 </button>
                 <button className={`${styles.btn} ${styles.crudRefreshBtn}`} onClick={loadCandidates}>
@@ -860,31 +874,33 @@ const Admin = () => {
 
             {/* Candidates List */}
             {!loading && candidates.length > 0 && (
-              <div className={styles.sectionCard}>
-                <h2 className={styles.sectionTitle}><span>👤</span> Candidates List</h2>
-                <div className={styles.dataTable}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Constituency</th>
-                        <th>Party</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {candidates.map((candidate, idx) => (
-                        <tr key={idx}>
-                          <td>{candidate.id || idx}</td>
-                          <td>{candidate.name}</td>
-                          <td>{candidate.constituency}</td>
-                          <td>{candidate.partyName}</td>
+                <div className={styles.sectionCard}>
+                  <h2 className={styles.sectionTitle}>
+                    <span>👤</span> Candidates List
+                  </h2>
+                  <div className={styles.dataTable}>
+                    <table className={styles.responsiveTable}>
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Name</th>
+                          <th>Constituency</th>
+                          <th>Party</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {candidates.sort((a,b)=>a.id-b.id).map((candidate, idx) => (
+                          <tr key={idx}>
+                            <td>{candidate.id || idx}</td>
+                            <td className={styles.wrapCell}>{candidate.name}</td>
+                            <td className={styles.wrapCell}>{candidate.constituency}</td>
+                            <td className={styles.wrapCell}>{candidate.partyName}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
             )}
              {/* Candidate Forms */}
             {showCandidateForm && (
@@ -893,7 +909,7 @@ const Admin = () => {
                 <form onSubmit={handleCreateCandidate}>
                   <div className={styles.formRow}>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Name</label>
+                      {/* <label className={styles.inputLabel}>Name</label> */}
                       <input
                         type="text"
                         className={styles.inputField}
@@ -904,7 +920,7 @@ const Admin = () => {
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Party</label>
+                      {/* <label className={styles.inputLabel}>Party</label> */}
                       <input
                         type="text"
                         className={styles.inputField}
@@ -916,7 +932,7 @@ const Admin = () => {
                     </div>
     
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Constituency</label>
+                      {/* <label className={styles.inputLabel}>Constituency</label> */}
                       <input
                         type="text"
                         className={styles.inputField}
@@ -953,7 +969,7 @@ const Admin = () => {
                 
                 <div className={styles.formRow}>
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Name</label>
+                    {/* <label className={styles.inputLabel}>Name</label> */}
                     <input
                       type="text"
                       className={styles.inputField}
@@ -963,7 +979,7 @@ const Admin = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Party</label>
+                    {/* <label className={styles.inputLabel}>Party</label> */}
                     <input
                       type="text"
                       className={styles.inputField}
@@ -974,7 +990,7 @@ const Admin = () => {
                   </div>
 
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Constituency</label>
+                    {/* <label className={styles.inputLabel}>Constituency</label> */}
                     <input
                       type="text"
                       className={styles.inputField}
@@ -1011,8 +1027,8 @@ const Admin = () => {
                   type="text" 
                   className={styles.deleteIdInput}
                   placeholder="Enter Candidate ID to Delete"
-                  value={candidateForm.id}
-                  onChange={(e) => setCandidateForm({...candidateForm, id: e.target.value})}
+                  value={deleteCandidateId}
+                  onChange={(e) => setDeleteCandidateId(e.target.value)}
                 />
                 <div className={styles.crudBtnGroup}>
                   <button 
@@ -1048,22 +1064,12 @@ const Admin = () => {
               {/* Get All Voters */}
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Page</label>
+                  {/* <label className={styles.inputLabel}>Page</label> */}
                   <input
                     type="number"
                     className={styles.inputField}
                     value={currentPage}
                     onChange={(e) => setCurrentPage(parseInt(e.target.value) || 1)}
-                    min="1"
-                  />
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Size</label>
-                  <input
-                    type="number"
-                    className={styles.inputField}
-                    value={votersPageSize}
-                    onChange={(e) => setVotersPageSize(parseInt(e.target.value) || 10)}
                     min="1"
                   />
                 </div>
@@ -1100,28 +1106,26 @@ const Admin = () => {
             {/* Voters Table */}
             {votersData.length > 0 && (
               <div className={styles.sectionCard}>
-                <h2 className={styles.sectionTitle}><span>📋</span> Voters Data</h2>
+                <h2 className={styles.sectionTitle}>
+                  <span>📋</span> Voters Data
+                </h2>
                 <div className={styles.dataTable}>
-                  <table>
+                  <table className={styles.responsiveTable}>
                     <thead>
                       <tr>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Status</th>
+                        <th>phone</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {votersData.map((voter, idx) => (
+                      {votersData.sort((a,b)=>a.id-b.id).map((voter, idx) => (
                         <tr key={idx}>
                           <td>{voter.id}</td>
-                          <td>{voter.name}</td>
-                          <td>{voter.email}</td>
-                          <td>
-                            <span className={`${styles.badge} ${styles.badgeSuccess}`}>
-                              {voter.status || 'Active'}
-                            </span>
-                          </td>
+                          <td className={styles.wrapCell}>{voter.name}</td>
+                          <td className={styles.wrapCell}>{voter.email}</td>
+                          <td className={styles.wrapCell}>{voter.phoneNumber}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1145,19 +1149,19 @@ const Admin = () => {
               {/* Get All Votes */}
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Contract Address</label>
+                  {/* <label className={styles.inputLabel}>Contract Address</label> */}
                   <input
                     type="text"
                     className={styles.inputField}
-                    placeholder="0x..."
-                    value={contractAddress}
-                    onChange={(e) => setContractAddress(e.target.value)}
+                    placeholder="Election Id"
+                    value={electionId}
+                    onChange={(e) => setElectionId(e.target.value)}
                   />
                 </div>
                 <button 
                   className={`${styles.btn} ${styles.btnPrimary}`} 
                   onClick={handleGetAllVotes}
-                  disabled={loading || !contractAddress.trim()}
+                  disabled={loading || !electionId.trim()}
                 >
                   📊 Get All Votes
                 </button>
@@ -1169,9 +1173,9 @@ const Admin = () => {
                   <input
                     type="text"
                     className={styles.inputField}
-                    placeholder="Contract Address"
-                    value={contractAddress}
-                    onChange={(e) => setContractAddress(e.target.value)}
+                    placeholder="Election Id"
+                    value={electionId}
+                    onChange={(e) => setElectionId(e.target.value)}
                   />
                   <input
                     type="text"
@@ -1183,7 +1187,7 @@ const Admin = () => {
                   <button 
                     className={`${styles.btn} ${styles.btnInfo}`} 
                     onClick={handleGetSingleVotes}
-                    disabled={loading || !contractAddress.trim() || !candidateIdForVotes.trim()}
+                    disabled={loading || !electionId.trim() || !candidateIdForVotes.trim()}
                   >
                     📈 Candidate Votes
                   </button>
@@ -1194,9 +1198,11 @@ const Admin = () => {
             {/* Votes Table */}
             {votesData.length > 0 && (
               <div className={styles.sectionCard}>
-                <h2 className={styles.sectionTitle}><span>📊</span> Vote Results</h2>
+                <h2 className={styles.sectionTitle}>
+                  <span>📊</span> Vote Results
+                </h2>
                 <div className={styles.dataTable}>
-                  <table>
+                  <table className={styles.responsiveTable}>
                     <thead>
                       <tr>
                         <th>Candidate ID</th>
@@ -1207,9 +1213,19 @@ const Admin = () => {
                     <tbody>
                       {votesData.map((vote, idx) => (
                         <tr key={idx}>
-                          <td>{vote.candidateId || idx}</td>
+                          <td className={styles.wrapCell}>{vote.candidateId || idx}</td>
                           <td>{vote.voteCount || 0}</td>
-                          <td>{((vote.voteCount || 0) / votesData.reduce((sum, v) => sum + (v.voteCount || 0), 0) * 100).toFixed(1)}%</td>
+                          <td>
+                            {(
+                              ((vote.voteCount || 0) /
+                                votesData.reduce(
+                                  (sum, v) => sum + (v.voteCount || 0),
+                                  0
+                                )) *
+                              100
+                            ).toFixed(1)}
+                            %
+                          </td>
                         </tr>
                       ))}
                     </tbody>
