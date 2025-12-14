@@ -672,7 +672,7 @@ const Admin = () => {
                           <td>{election.electionName}</td>
                           <td>{`${election.startDate.slice(0,10)}  ${election.startDate.slice(11)}`}</td>
                           <td>{`${election.endDate.slice(0,10)}  ${election.endDate.slice(11)}`}</td>
-                          <td>{election.contractAddress}</td>
+                          <td style={{fontSize:"12px"}}>{election.contractAddress}</td>
                         </tr>
                       ))}
                     </tbody>

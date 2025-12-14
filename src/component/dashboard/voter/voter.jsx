@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './voter.module.css';
 
+
 const Voter = () => {
   const navigate=useNavigate();
- useEffect(() => {
-   if(!localStorage.getItem('token')){
-    navigate('/login');
-   }
+  useEffect(() => {
+    if(!localStorage.getItem('token')){
+      navigate('/login');
+    }
   }); 
 
   
@@ -24,6 +25,10 @@ const Voter = () => {
     };
   });
 
+  // NEW: global message for alerts
+  const [message, setMessage] = useState(null);
+
+
   // Stats State
   const [stats, setStats] = useState({
     activeElections: 3,
@@ -32,19 +37,23 @@ const Voter = () => {
     accountStatus: 'Active'
   });
 
+
   // Profile State
   const [voterDetails, setVoterDetails] = useState({
     name: 'N/A', 
     id: 'N/A'
     }
     );
-const [searchVoterId, setSearchVoterId] = useState('');
+  const [searchVoterId, setSearchVoterId] = useState('');
 
-// Elections State (put near Candidates State)
-const [elections, setElections] = useState([]);
+
+  // Elections State (put near Candidates State)
+  const [elections, setElections] = useState([]);
+
 
   // Candidates State
   const [candidates, setCandidates] = useState([]);
+
 
   // Vote Form State
   const [voteForm, setVoteForm] = useState({
@@ -54,9 +63,11 @@ const [elections, setElections] = useState([]);
   });
   const [voteMessage, setVoteMessage] = useState(null);
 
+
   // Results State
   const [results, setResults] = useState([]);
-  const [resultsContract, setResultsContract] = useState('');
+  const [resultsId, setResultsId] = useState('');
+
 
   // Update Profile State
   const [updateForm, setUpdateForm] = useState({
@@ -69,121 +80,101 @@ const [elections, setElections] = useState([]);
   });
   const [updateMessage, setUpdateMessage] = useState(null);
 
-  
-  // const apiCalls = {
-  //   getVoterDetails: async (voterId) => {
-  //     const response = await api.get(`voter/${voterId}`);
-  //     return response.data;
-  //   },
-  // // In apiCalls object, add:
-  // getAllElections: async () => {
-  //   const response = await api.get('/voter/election');
-  //   return response.data;
-  // },
 
-  //   getAllCandidates: async () => {
-  //     const response = await api.get('/voter/candidates');
-  //     return response.data;
-  //   },
-  //   castVote: async (data) => {
-  //     const response = await api.post('/voter/votes/vote', data);
-  //     return response.data;
-  //   },
-  //   getVoteResults: async (contractAddress) => {
-  //     const response = await api.get(`/voter/getVotes/${contractAddress}`);
-  //     return response.data;
-  //   },
-  //   updateVoter: async (voterId, data) => {
-  //     const response = await api.put(`/voter/updateVoter/${voterId}`, data);
-  //     return response.data;
-  //   }
-  // };
   const API_BASE_URL = 'https://voting-system-m7jo.onrender.com/api/v1/voter';
 
-const apiCalls = {
-  getVoterDetails: async (voterId) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/${voterId.trim()}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-   
-    return await response.json();
-  },
 
-  getAllElections: async () => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/election`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    const data = await response.json();
-    return data.content || data; // Handle Spring Boot pagination
-  },
+  const apiCalls = {
+    getVoterDetails: async (voterId) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/${voterId.trim()}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      return await response.json();
+    },
 
-  getAllCandidates: async () => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/candidates`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    const data = await response.json();
-    return data.content || data;
-  },
 
-  castVote: async (data) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/votes/vote`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    return await response.json();
-  },
+    getAllElections: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/election`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      return data.content || data; // Handle Spring Boot pagination
+    },
 
-  getVoteResults: async (electionId) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/getVotes/${electionId.trim()}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    return await response.json();
-  },
 
-  updateVoter: async ( data) => {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/updateVoter`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    return await response;
-  }
-};
+    getAllCandidates: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/candidates`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      return data.content || data;
+    },
 
-useEffect(() => {
-  if (currentSection === 'elections') {
-    loadElections();
-  }
-}, [currentSection]);
+
+    castVote: async (data) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/votes/vote`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      return await response.json();
+    },
+
+
+    getVoteResults: async (electionId) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/getVotes/${electionId.trim()}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return await response.json();
+    },
+
+
+    updateVoter: async ( data) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/updateVoter`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      return await response;
+    }
+  };
+
+
+  useEffect(() => {
+    if (currentSection === 'elections') {
+      loadElections();
+    }
+  }, [currentSection]);
+
 
   // Load candidates on mount
   useEffect(() => {
@@ -192,98 +183,116 @@ useEffect(() => {
     }
   }, [currentSection]);
 
+
   // Handlers
   const handleGetVoterDetails = async (voterId) => {
-    // if (!voterId.trim()) {
-    //   alert('Please enter your Voter ID');
-    //   return;
-    // }
+    if (!voterId.trim()) {
+      setMessage({ type: 'error', text: 'Please enter your Voter ID' });
+      return;
+    }
     
     try {
       setLoading(true);
       const data = await apiCalls.getVoterDetails(voterId);
       setVoterDetails(data);
+      setMessage(null);
     } catch (error) {
-      alert(`Error: ${error.response?.data?.message || 'Failed to fetch voter details'}`);
+      setMessage({ type: 'error', text: error?.response?.data || 'Failed to fetch voter details' });
     } finally {
       setLoading(false);
     }
   };
 
-const loadElections = async () => {
-  try {
-    setLoading(true);
-    const data = await apiCalls.getAllElections();
-    setElections(data.content || data);
-  } catch (error) {
-    console.error('Error fetching elections:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+
+  const loadElections = async () => {
+    try {
+      setLoading(true);
+      const data = await apiCalls.getAllElections();
+      setElections(data.content || data);
+      setMessage(null);
+    } catch (error) {
+      console.error('Error fetching elections:', error);
+      setMessage({ type: 'error', text: 'Error fetching elections' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const loadCandidates = async () => {
     try {
       setLoading(true);
       const data = await apiCalls.getAllCandidates();
       setCandidates(data.content || data);
+      setMessage(null);
     } catch (error) {
       console.error('Error fetching candidates:', error);
+      setMessage({ type: 'error', text: 'Error fetching candidates' });
     } finally {
       setLoading(false);
     }
   };
 
+
   const handleCastVote = async (e) => {
     e.preventDefault();
 
-    if (!voteForm.contractAddress || !voteForm.candidateId || !voteForm.confirmCandidateId) {
-      alert('Please fill in all fields');
+
+    if (!voteForm.id || !voteForm.candidateId || !voteForm.confirmCandidateId) {
+      setMessage({ type: 'error', text: 'Please fill in all fields' });
       return;
     }
 
+
     if (voteForm.confirmCandidateId !== voteForm.candidateId) {
-      alert('Confirmation does not match selected candidate ID');
+      setMessage({ type: 'error', text: 'Confirmation does not match selected candidate ID' });
       return;
     }
+
 
     if (!window.confirm(`Are you sure you want to vote for candidate ${voteForm.candidateId}? This action cannot be undone.`)) {
       return;
     }
 
+
     try {
       setLoading(true);
       await apiCalls.castVote({
-        contractAddress: voteForm.contractAddress,
+        id: voteForm.id,
         candidateId: voteForm.candidateId,
-        voterId: user.voterId
+        voterId: voterDetails.id
       });
       setVoteMessage({ type: 'success', text: 'Your vote has been successfully recorded! Thank you for participating.' });
-      setVoteForm({ contractAddress: '', candidateId: '', confirmCandidateId: '' });
+      setVoteForm({ id: '', candidateId: '', confirmCandidateId: '' });
       setTimeout(() => setVoteMessage(null), 7000);
+      setMessage(null);
     } catch (error) {
-      setVoteMessage({ type: 'error', text: error.response?.data?.message || 'Failed to cast vote. Please try again.' });
+      setVoteMessage({ type: 'error', text: error?.response?.data || 'Failed to cast vote. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
 
+
   const handleGetResults = async () => {
-    if (!resultsContract.trim()) {
-      alert('Please enter contract address');
+    if (!resultsId.trim()) {
+      setMessage({ type: 'error', text: 'Please enter election id' });
       return;
     }
 
+
     try {
       setLoading(true);
-      const data = await apiCalls.getVoteResults(resultsContract);
+      const data = await apiCalls.getVoteResults(resultsId);
       setResults(data);
+      setMessage(null);
     } catch (error) {
-      alert(`Error: ${error.response?.data?.message || 'Failed to fetch vote results'}`);
+      setMessage({ type: 'error', text: error?.response?.data || 'Failed to fetch vote results' });
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -291,40 +300,44 @@ const loadElections = async () => {
 
     const updateData = {};
     updateData.id=updateForm.id;
-  if (updateForm.name.trim()) updateData.name = updateForm.name.trim();
-  if (updateForm.email.trim()) updateData.email = updateForm.email.trim();
-  if (updateForm.phone.trim()) updateData.phone = updateForm.phone.trim();
-  if (updateForm.age) updateData.age = parseInt(updateForm.age);
-  if (updateForm.address.trim()) updateData.address = updateForm.address.trim();
+    if (updateForm.name.trim()) updateData.name = updateForm.name.trim();
+    if (updateForm.email.trim()) updateData.email = updateForm.email.trim();
+    if (updateForm.phone.trim()) updateData.phone = updateForm.phone.trim();
+    if (updateForm.age) updateData.age = parseInt(updateForm.age);
+    if (updateForm.address.trim()) updateData.address = updateForm.address.trim();
 
-  if (Object.keys(updateData).length === 0) {
-    alert('Please fill at least one field');
-    return;
-  }
-   if (updateData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
-    alert('Invalid email');
-    return;
-  }
-  if (updateData.phone && (updateData.phone.length !== 10 || !/^\d+$/.test(updateData.phone))) {
-    alert('Valid 10-digit phone required');
-    return;
-  }
-  if (updateData.age && updateData.age < 18) {
-    alert('Must be 18+');
-    return;
-  }
+
+    if (Object.keys(updateData).length === 1) { // only id present
+      setMessage({ type: 'error', text: 'Please fill at least one field' });
+      return;
+    }
+    if (updateData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
+      setMessage({ type: 'error', text: 'Invalid email' });
+      return;
+    }
+    if (updateData.phone && (updateData.phone.length !== 10 || !/^\d+$/.test(updateData.phone))) {
+      setMessage({ type: 'error', text: 'Valid 10-digit phone required' });
+      return;
+    }
+    if (updateData.age && updateData.age < 18) {
+      setMessage({ type: 'error', text: 'Must be 18+' });
+      return;
+    }
+
 
     try {
       setLoading(true);
       await apiCalls.updateVoter( updateData);
       setUpdateMessage({ type: 'success', text: 'Profile updated successfully! Changes will be reflected shortly.' });
       setTimeout(() => setUpdateMessage(null), 5000);
+      setMessage(null);
     } catch (error) {
-    setUpdateMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile. Please try again.' });
+      setUpdateMessage({ type: 'error', text: error?.response?.data || 'Failed to update profile. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className={styles.layout}>
@@ -336,6 +349,7 @@ const loadElections = async () => {
         ☰
       </button>
 
+
       {/* Sidebar */}
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.logo}>
@@ -343,11 +357,13 @@ const loadElections = async () => {
           <span>VotePortal</span>
         </div>
 
+
         <div className={styles.userProfile}>
           <div className={styles.userAvatar}>👤</div>
           <div className={styles.userName}>{user.name}</div>
           <div className={styles.userId}>Voter ID: {user.id}</div>
         </div>
+
 
         <div className={styles.navSection}>
           <div className={styles.navTitle}>Dashboard</div>
@@ -359,6 +375,7 @@ const loadElections = async () => {
             <span>Overview</span>
           </button>
         </div>
+
 
         <div className={styles.navSection}>
           <div className={styles.navTitle}>Actions</div>
@@ -383,6 +400,7 @@ const loadElections = async () => {
   <span>🗂️</span>
   <span>View Elections</span>
 </button>
+
 
           <button
             className={`${styles.navItem} ${currentSection === 'vote' ? styles.navItemActive : ''}`}
@@ -414,12 +432,9 @@ const loadElections = async () => {
           </button>
         </div>
 
+
         <div className={styles.navSection}>
           <div className={styles.navTitle}>Account</div>
-          {/* <button className={styles.navItem}>
-            <span>⚙️</span>
-            <span>Settings</span>
-          </button> */}
           <button 
             className={styles.navItem} 
             onClick={() => {
@@ -434,8 +449,18 @@ const loadElections = async () => {
         </div>
       </aside>
 
+
       {/* Main Content */}
       <main className={styles.mainContent}>
+
+        {/* GLOBAL MESSAGE */}
+        {message && (
+          <div className={`${styles.alert} ${message.type === 'error' ? styles.alertWarning : styles.alertInfo}`}>
+            <span>{message.type === 'error' ? '✗' : 'ℹ️'}</span>
+            <span>{message.text}</span>
+          </div>
+        )}
+
         {/* Overview Section */}
         {currentSection === 'overview' && (
           <div>
@@ -549,11 +574,11 @@ const loadElections = async () => {
       </div>
       <div className={styles.infoRow}>
         <span className={styles.infoLabel}>Has Voted</span>
-        <span className={styles.infoValue}>{user.hasVoted?'No':'Yes'}</span>
+        <span className={styles.infoValue}>{user.hasVoted?'Yes':'No'}</span>
       </div>
       <div className={styles.infoRow}>
         <span className={styles.infoLabel}>Voter Address</span>
-        <span className={styles.infoValue}>{user.voterAddress}</span>
+        <span className={styles.infoValue} style={{fontSize:"12px"}} >{user.voterAddress}</span>
       </div>
       <div className={styles.infoRow}>
         <span className={styles.infoLabel}>Account Status</span>
@@ -674,8 +699,9 @@ const loadElections = async () => {
 
             <div className={styles.electionBody}>
               <div className={styles.electionMeta}>
-                <span>Contract: {election.contractAddress}</span>
-                <span>Type: {election.type}</span>
+                 <span>ID: {election.id}</span>
+                <span>Contract: {election.contractAddress.slice(0,16)}..</span>
+                <span>Type: {election.electionName}</span>
               </div>
               <div className={styles.electionDates}>
                 <span>Starts: {new Date(election.startDate).toLocaleString()}</span>
@@ -784,8 +810,8 @@ const loadElections = async () => {
                   onChange={(e) => setVoteForm({ ...voteForm, id: e.target.value })}
                   required
                 />
-
-                <label className={styles.label}>Select Candidate *</label>
+{/* 
+                <label className={styles.label}>Select Candidate *</label> */}
                 <select
                   className={styles.inputField}
                   value={voteForm.candidateId}
@@ -795,7 +821,7 @@ const loadElections = async () => {
                   <option value="">Choose a candidate...</option>
                   {candidates.map((c) => (
                     <option key={c.candidateId} value={c.candidateId}>
-                     {c.id} - {c.name} - {c.partyName}
+                     {c.id} - {c.name} - {c.constituency} - {c.partyName}
                     </option>
                   ))}
                 </select>
@@ -853,8 +879,8 @@ const loadElections = async () => {
                 type="text"
                 className={styles.inputField}
                 placeholder="Enter election id"
-                value={resultsContract}
-                onChange={(e) => setResultsContract(e.target.value)}
+                value={resultsId}
+                onChange={(e) => setResultsId(e.target.value)}
               />
 
               <button 
@@ -888,7 +914,7 @@ const loadElections = async () => {
                           <tr key={index}>
                             <td><strong>#{index + 1}</strong></td>
                             <td><strong>{result.name}</strong></td>
-                            <td>{result.party}</td>
+                            <td>{result.partyName}</td>
                             <td><strong className={styles.voteCount}>{result.votes.toLocaleString()}</strong></td>
                             <td>
                               <span className={`${styles.badge} ${styles.badgeInfo}`}>{percentage}%</span>
