@@ -28,7 +28,7 @@ const Admin = () => {
   const [elections, setElections] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [votersData, setVotersData] = useState([]);
-  const [votesData, setVotesData] = useState([]);
+  const [votesData, setVotesData] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [votersPageSize, setVotersPageSize] = useState(10);
 
@@ -56,6 +56,7 @@ const Admin = () => {
   const [updateCandidateId, setUpdateCandidateId] = useState('');
   const [deleteCandidateId, setDeleteCandidateId] = useState('');
   const [voterId, setVoterId] = useState('');
+  const[secondElectionId,setSecondElectionId]=useState('');
   const [electionId, setElectionId] = useState('');
   const [candidateIdForVotes, setCandidateIdForVotes] = useState('');
 
@@ -239,10 +240,16 @@ const Admin = () => {
         apiCalls.getAllElections(),
         apiCalls.getAllCandidates()
       ]);
+      elections.forEach(async (e)=>{
+       const response= await apiCalls.handleGetAllVotes(e.id);
+       console.log(reponse);
+      setVotersData(votersData+Array.isArray(response) ? response.length : 0);
+      });     
       setElections(Array.isArray(electionsData) ? electionsData : []);
       setCandidates(Array.isArray(candidatesData) ? candidatesData : []);
+
     } catch (error) {
-      console.error('Error loading overview:', error);
+      console.error('Error loading overview:', error.reponse.data);
     }
   };
 
@@ -325,17 +332,17 @@ const Admin = () => {
   };
 
   const handleDeleteElection = async () => {
-    if (!electionForm.id) {
+    if (!deleteElectionId) {
       setMessage({ type: 'error', text: 'Please enter Election ID' });
       return;
     }
-    if (!window.confirm(`Delete election ${electionForm.id}?`)) return;
+    if (!window.confirm(`Delete election ${deleteElectionId}?`)) return;
 
     try {
       setLoading(true);
       await apiCalls.deleteElection(electionForm.id.trim());
       setMessage({ type: 'success', text: `Election ${electionForm.id} deleted!` });
-     emptyElectionForm();
+     setDeleteElectionId('');
       setTimeout(() => setMessage(null), 5000);
       loadElections();
     } catch (error) {
@@ -475,16 +482,16 @@ const Admin = () => {
   };
 
   const handleGetSingleVotes = async () => {
-    if (!electionId.trim() || !candidateIdForVotes.trim()) {
+    if (!secondElectionId.trim() || !candidateIdForVotes.trim()) {
       setMessage({ type: 'error', text: 'Please fill all fields' });
       return;
     }
     try {
       setLoading(true);
-      const data = await apiCalls.getSingleCandidateVotes(electionId.trim(), candidateIdForVotes.trim());
+      const data = await apiCalls.getSingleCandidateVotes(secondElectionId.trim(), candidateIdForVotes.trim());
       setVotesData(Array.isArray(data) ? data : [data]);
     } catch (error) {
-      setMessage({ type: 'error', text: eroor.repomse.data|| 'Failed to fetch candidate votes' });
+      setMessage({ type: 'error', text: error.respone.data|| 'Failed to fetch candidate votes' });
       setVotesData([]);
     } finally {
       setLoading(false);
@@ -523,7 +530,7 @@ const Admin = () => {
           <div className={styles.navTitle}>Dashboard</div>
           <button
             className={`${styles.navItem} ${currentSection === 'overview' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection('overview')}
+            onClick={() => setCurrentSection(currentSection!=='overview'?'overview':'')}
           >
             <span>📊</span>
             <span>Overview</span>
@@ -534,28 +541,28 @@ const Admin = () => {
           <div className={styles.navTitle}>Management</div>
           <button
             className={`${styles.navItem} ${currentSection === 'elections' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection('elections')}
+            onClick={() => setCurrentSection(currentSection!=='elections'?'elections':'')}
           >
             <span>🗳️</span>
             <span>Elections</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'candidates' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection('candidates')}
+            onClick={() => setCurrentSection(currentSection!=='candidates'?'candidates':'')}
           >
             <span>👤</span>
             <span>Candidates</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'voters' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection('voters')}
+            onClick={() => setCurrentSection(currentSection!=='voters'?'voters':'')}
           >
             <span>👥</span>
             <span>Voters</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'votes' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection('votes')}
+            onClick={() => setCurrentSection(currentSection!=='votes'?'votes':'')}
           >
             <span>📈</span>
             <span>Vote Results</span>
@@ -601,7 +608,7 @@ const Admin = () => {
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statLabel}>Total Votes</div>
-                <div className={styles.statValue}>{votesData.length}</div>
+                <div className={styles.statValue}>{votesData}</div>
               </div>
             </div>
           </div>
@@ -702,6 +709,7 @@ const Admin = () => {
              {/* Election Forms */}
             {showElectionForm && (
               <div className={styles.inputForm}>
+                <br />
                 <h3 className={styles.formTitle}><span>➕</span> Create New Election</h3>
                 <form onSubmit={handleCreateElection}>
                   <div className={styles.formRow}>
@@ -750,7 +758,9 @@ const Admin = () => {
             )}
             {/* UPDATE ELECTION */}
             {showUpdateElection && (
+              
               <div className={styles.sectionCard}>
+                <br />
                 <h3 className={styles.formTitle}>✏️ Update Election</h3>
                 <input 
                   type="text" 
@@ -762,7 +772,7 @@ const Admin = () => {
                 
                 <div className={styles.formRow}>
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Election Name</label>
+                    {/* <label className={styles.inputLabel}>Election Name</label> */}
                     <input
                       type="text"
                       className={styles.inputField}
@@ -772,7 +782,7 @@ const Admin = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Start Date</label>
+                    {/* <label className={styles.inputLabel}>Start Date</label> */}
                     <input
                       type="datetime-local"
                       className={styles.inputField}
@@ -781,7 +791,7 @@ const Admin = () => {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>End Date</label>
+                    {/* <label className={styles.inputLabel}>End Date</label> */}
                     <input
                       type="datetime-local"
                       className={styles.inputField}
@@ -817,14 +827,14 @@ const Admin = () => {
                   type="text" 
                   className={styles.deleteIdInput}
                   placeholder="Enter Election ID to Delete"
-                  value={electionForm.id}
-                  onChange={(e) => setElectionForm({...electionForm, id: e.target.value})}
+                  value={deleteElectionId}
+                  onChange={(e) => setDeleteElectionId( e.target.value)}
                 />
                 <div className={styles.crudBtnGroup}>
                   <button 
                     className={`${styles.btn} ${styles.crudDeleteBtn}`} 
                     onClick={handleDeleteElection}
-                    disabled={loading || !electionForm.id.trim()}
+                    disabled={loading || !deleteElectionId.trim()}
                   >
                     ⚠️ Confirm Delete
                   </button>
@@ -863,7 +873,7 @@ const Admin = () => {
                 <button className={`${styles.btn} ${styles.crudUpdateBtn}`} onClick={() => setShowUpdateCandidate(true)}>
                   ✏️ Update Candidate
                 </button>
-                <button className={`${styles.btn} ${styles.crudDeleteBtn}`} onClick={() => setDeleteCandidate(true)}>
+                <button className={`${styles.btn} ${styles.crudDeleteBtn}`} onClick={() => setShowDeleteCandidate(true)}>
                   🗑️ Delete Candidate
                 </button>
                 <button className={`${styles.btn} ${styles.crudRefreshBtn}`} onClick={loadCandidates}>
@@ -905,6 +915,7 @@ const Admin = () => {
              {/* Candidate Forms */}
             {showCandidateForm && (
               <div className={styles.inputForm}>
+                <br />
                 <h3 className={styles.formTitle}><span>➕</span> Create New Candidate</h3>
                 <form onSubmit={handleCreateCandidate}>
                   <div className={styles.formRow}>
@@ -958,6 +969,7 @@ const Admin = () => {
             {/* UPDATE CANDIDATE */}
             {showUpdateCandidate && (
               <div className={styles.sectionCard}>
+                <br />
                 <h3 className={styles.formTitle}>✏️ Update Candidate</h3>
                 <input 
                   type="text" 
@@ -1175,7 +1187,7 @@ const Admin = () => {
                     className={styles.inputField}
                     placeholder="Election Id"
                     value={electionId}
-                    onChange={(e) => setElectionId(e.target.value)}
+                    onChange={(e) => setSecondElectionId(e.target.value)}
                   />
                   <input
                     type="text"

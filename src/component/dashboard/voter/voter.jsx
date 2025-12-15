@@ -577,7 +577,7 @@ const Voter = () => {
         <span className={styles.infoValue}>{user.hasVoted?'Yes':'No'}</span>
       </div>
       <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Voter Address</span>
+        <span className={styles.infoLabel}>Ethereum wallet Address</span>
         <span className={styles.infoValue} style={{fontSize:"12px"}} >{user.voterAddress}</span>
       </div>
       <div className={styles.infoRow}>
@@ -700,7 +700,7 @@ const Voter = () => {
             <div className={styles.electionBody}>
               <div className={styles.electionMeta}>
                 <span>ID: {election.id}</span><br />
-                <span>Contract: {election.contractAddress.slice(0,16)}..</span><br />
+                <span>Contract: {election.contractAddress}</span><br />
                 <span>Type: {election.electionName}</span>
               </div>
 
@@ -911,10 +911,10 @@ const Voter = () => {
                     <table className={styles.table}>
                       <thead>
                         <tr>
-                          <th>Rank</th>
-                          <th>Candidate</th>
-                          <th>Votes</th>
-                          <th>Percentage</th>
+                          <th>Rank </th>
+                          <th>Candidate </th>
+                          <th>Votes </th>
+                          <th>Percentage </th>
                           <th>Progress</th>
                         </tr>
                       </thead>
@@ -927,12 +927,12 @@ const Voter = () => {
 
                           return (
                             <tr key={row.name}>
-                              <td><strong>#{index + 1}</strong></td>
-                              <td><strong>{row.name}</strong></td>
-                              <td>{row.votes}</td>
+                              <td><strong> #{index + 1}</strong></td>
+                              <td><strong>  {row.name}</strong></td>
+                              <td>  {row.votes}</td>
                               <td>
                                 <span className={`${styles.badge} ${styles.badgeInfo}`}>
-                                  {percentage}%
+                                      {percentage}%
                                 </span>
                               </td>
                               <td>
@@ -1058,7 +1058,7 @@ const Voter = () => {
                 {/* <label className={styles.label}>Voter Address </label> */}
                 <textarea
                   className={`${styles.inputField} ${styles.textArea}`}
-                  placeholder="Enter your voterAddress..."
+                  placeholder="Enter your Ethereum wallet address"
                   value={updateForm.address}
                   onChange={(e) => setUpdateForm({ ...updateForm, address: e.target.value })}
                 />

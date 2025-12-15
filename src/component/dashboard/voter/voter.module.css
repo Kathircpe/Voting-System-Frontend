@@ -380,6 +380,7 @@
 
 .infoValue {
   font-weight: 600;
+  word-break: break-all; 
   color: #e2e8f0;
 }
 
@@ -530,7 +531,12 @@
   display: flex;
   justify-content: space-between;
   gap: 8px;
+  word-break: break-all; 
   flex-wrap: wrap;
+}
+
+.electionMeta span {
+  display: block;
 }
 
 .electionDates {

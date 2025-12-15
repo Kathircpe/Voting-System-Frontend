@@ -241,6 +241,9 @@ const Signup = () => {
           <div className={styles.logoContainer}>ECI</div>
           <h1>Create Account</h1>
           <p>Sign up to access your voting portal</p>
+           <p>Your data is securely stored and </p>
+           <p>won't be compromised at any time</p>
+
         </div>
 
         {message.text && (
@@ -369,7 +372,7 @@ const Signup = () => {
                 required
                 minLength="10"
               />
-              <label htmlFor="address">Voter Account Address</label>
+              <label htmlFor="address">Etheruem Wallet Address</label>
             </div>
             {validation.address && (
               <div className={`${styles.validationMsg} ${validation.address.valid ? styles.success : styles.error} ${styles.show}`}>
