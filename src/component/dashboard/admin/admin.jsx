@@ -503,14 +503,14 @@ const dd=String(d.getDate()).padStart(2,'0');
 const mm=String(d.getMonth()+1).padStart(2,'0');
 const yyyy=d.getFullYear();
 
-const hh=String(d.getHours()).padStart(2,'0');
+let hh=String(d.getHours()).padStart(2,'0');
 const min=String(d.getMinutes()).padStart(2,'0');
 const ss=String(d.getSeconds()).padStart(2,'0');
 let isAm=true;
 if(hh>11)isAm=false;
   hh=hh%12;
   hh=(!isAm&&hh==0)?'12':hh;
-  return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss}${isAm?'AM':'PM'}`;
+  return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss} ${isAm?'AM':'PM'}`;
 }
   const handleLogout = () => {
     localStorage.removeItem('token');
