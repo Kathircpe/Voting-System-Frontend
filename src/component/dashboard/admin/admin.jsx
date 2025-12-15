@@ -28,7 +28,7 @@ const Admin = () => {
   const [elections, setElections] = useState([]);
   const [candidates, setCandidates] = useState([]);
   const [votersData, setVotersData] = useState([]);
-  const [votesData, setVotesData] = useState(0);
+  const [votesData, setVotesData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [votersPageSize, setVotersPageSize] = useState(10);
 
@@ -207,9 +207,9 @@ const Admin = () => {
       return await response.json();
     },
 
-    getSingleCandidateVotes: async () => {
+    getSingleCandidateVotes: async (id,candidateId) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/getVotes`, {
+      const response = await fetch(`${API_BASE_URL}/getVotes?id=${id}&candidateId${candidateId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -486,12 +486,13 @@ const Admin = () => {
       setMessage({ type: 'error', text: 'Please fill all fields' });
       return;
     }
+    
     try {
       setLoading(true);
-      const data = await apiCalls.getSingleCandidateVotes(secondElectionId.trim(), candidateIdForVotes.trim());
+      const data = await apiCalls.getSingleCandidateVotes(secondElectionId,candidateIdForVotes);
       setVotesData(Array.isArray(data) ? data : [data]);
     } catch (error) {
-      setMessage({ type: 'error', text: error.respone.data|| 'Failed to fetch candidate votes' });
+      setMessage({ type: 'error', text: error.response?.data||error.message|| 'Failed to fetch candidate votes' });
       setVotesData([]);
     } finally {
       setLoading(false);
@@ -1145,6 +1146,8 @@ if(hh>11)isAm=false;
                         <th>Name</th>
                         <th>Email</th>
                         <th>phone</th>
+                        <th>has voted?</th>
+                        <th>is enabled ?</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1154,6 +1157,8 @@ if(hh>11)isAm=false;
                           <td className={styles.wrapCell}>{voter.name}</td>
                           <td className={styles.wrapCell}>{voter.email}</td>
                           <td className={styles.wrapCell}>{voter.phoneNumber}</td>
+                          <td className={styles.wrapCell}>{voter.hasVoted?'YES':'NO'}</td>
+                          <td className={styles.wrapCell}>{voter.isEnabled?'YES':'NO'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1202,7 +1207,7 @@ if(hh>11)isAm=false;
                     type="text"
                     className={styles.inputField}
                     placeholder="Election Id"
-                    value={electionId}
+                    value={secondElectionId}
                     onChange={(e) => setSecondElectionId(e.target.value)}
                   />
                   <input
@@ -1215,7 +1220,7 @@ if(hh>11)isAm=false;
                   <button 
                     className={`${styles.btn} ${styles.btnInfo}`} 
                     onClick={handleGetSingleVotes}
-                    disabled={loading || !electionId.trim() || !candidateIdForVotes.trim()}
+                    disabled={loading || !secondElectionId.trim() || !candidateIdForVotes.trim()}
                   >
                     📈 Candidate Votes
                   </button>
@@ -1236,6 +1241,8 @@ if(hh>11)isAm=false;
                     <thead>
                       <tr>
                         <th>Candidate ID</th>
+                        <th>name</th>
+                        <th>party</th>
                         <th>Votes Count</th>
                         <th>Percentage</th>
                       </tr>
@@ -1243,11 +1250,13 @@ if(hh>11)isAm=false;
                     <tbody>
                       {votesData.map((vote, idx) => (
                         <tr key={idx}>
-                          <td className={styles.wrapCell}>{vote.candidateId || idx}</td>
-                          <td>{vote.voteCount || 0}</td>
+                          <td className={styles.wrapCell}>{vote.id || idx}</td>
+                          <td>{vote.name || 0}</td>
+                          <td>{vote.partyName || 0}</td>
+                          <td>{vote.votes || 0}</td>
                           <td>
                             {(
-                              ((vote.voteCount || 0) /
+                              ((vote.votes || 0) /
                                 votesData.reduce(
                                   (sum, v) => sum + (v.voteCount || 0),
                                   0

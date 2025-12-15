@@ -907,88 +907,99 @@ if(hh>11)isAm=false;
               </button>
             </div>
 
-          {results.length > 0 && (
-         <>
-          {(() => {
-            // flatten: [{ name, votes }]
-            const parsed = results.map((r) => {
-              const [key, value] = Object.entries(r)[0];
-              return { name: key, votes: value };
-              });
+         <div className={styles.voteResults}>
+            {results.length > 0 ? (
+              (() => {
+                const parsed = results.map((r) => ({
+                  candidateId: r.id,
+                  name: r.name,
+                  partyName: r.partyName,
+                  votes: r.votes
+                }));
 
-              const totalVotes = parsed.reduce((sum, r) => sum + r.votes, 0);
-              const sorted = [...parsed].sort((a, b) => b.votes - a.votes);
+                const totalVotes = parsed.reduce((sum, r) => sum + r.votes, 0);
+                const sorted = [...parsed].sort((a, b) => b.votes - a.votes);
 
-              return (
-                <>
-                  <div className={styles.tableContainer}>
-                    <table className={styles.table}>
-                      <thead>
-                        <tr>
-                          <th>Rank </th>
-                          <th>Candidate </th>
-                          <th>Votes </th>
-                          <th>Percentage </th>
-                          <th>Progress</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sorted.map((row, index) => {
-                          const percentage =
-                            totalVotes > 0
+                return (
+                  <>
+                    <div className={styles.tableContainer}>
+                      <table className={styles.electionTable}>
+                        <thead>
+                          <tr>
+                            <th className={styles.tableHeader}>Rank</th>
+                            <th className={styles.tableHeader}>Candidate</th>
+                            <th className={styles.tableHeader}>Party</th>
+                            <th className={styles.tableHeader}>Votes</th>
+                            <th className={styles.tableHeader}>%</th>
+                            <th className={styles.tableHeader}>Progress</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sorted.map((row, index) => {
+                            const percentage = totalVotes > 0
                               ? ((row.votes / totalVotes) * 100).toFixed(1)
                               : 0;
 
-                          return (
-                            <tr key={row.name}>
-                              <td><strong> #{index + 1}</strong></td>
-                              <td><strong>  {row.name}</strong></td>
-                              <td>  {row.votes}</td>
-                              <td>
-                                <span className={`${styles.badge} ${styles.badgeInfo}`}>
-                                      {percentage}%
-                                </span>
-                              </td>
-                              <td>
-                                <div className={styles.progressBar}>
-                                  <div
-                                    className={styles.progressFill}
-                                    style={{ width: `${percentage}%` }}
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                            return (
+                              <tr key={row.candidateId} className={styles.tableRow}>
+                                <td className={styles.tableCell}>
+                                  <strong>#{index + 1}</strong>
+                                </td>
+                                <td className={styles.tableCell}>
+                                  <div className={styles.candidateName}>
+                                    <strong>{row.name}</strong>
+                                    <span className={styles.candidateId}>#{row.candidateId}</span>
+                                  </div>
+                                </td>
+                                <td className={styles.tableCell}>
+                                  <span className={styles.partyBadge}>{row.partyName}</span>
+                                </td>
+                                <td className={`${styles.tableCell} ${styles.votesCell}`}>
+                                  {row.votes.toLocaleString()}
+                                </td>
+                                <td className={styles.tableCell}>
+                                  <span className={`${styles.badge} ${styles.badgeInfo}`}>
+                                    {percentage}%
+                                  </span>
+                                </td>
+                                <td className={styles.tableCell}>
+                                  <div className={styles.progressBar}>
+                                    <div
+                                      className={styles.progressFill}
+                                      style={{ width: `${percentage}%` }}
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
 
-                  <div className={styles.infoCard}>
-                    <div className={styles.infoRow}>
-                      <span className={styles.infoLabel}>Total Votes Cast</span>
-                      <span className={`${styles.infoValue} ${styles.infoValueLarge}`}>
-                        {totalVotes.toLocaleString()}
-                      </span>
+                    <div className={styles.infoCard}>
+                      <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>Total Votes Cast</span>
+                        <span className={`${styles.infoValue} ${styles.infoValueLarge}`}>
+                          {totalVotes.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className={styles.infoRow}>
+                        <span className={styles.infoLabel}>Leading Candidate</span>
+                        <span className={styles.infoValue}>{sorted[0]?.name || 'N/A'}</span>
+                      </div>
+                      <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
+                        <span className={styles.infoLabel}>Leading Party</span>
+                        <span className={styles.infoValue}>{sorted[0]?.partyName || 'N/A'}</span>
+                      </div>
                     </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.infoLabel}>Leading Candidate</span>
-                      <span className={styles.infoValue}>
-                        {sorted[0]?.name || 'N/A'}
-                      </span>
-                    </div>
-                    <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
-                      <span className={styles.infoLabel}>Election Status</span>
-                      <span className={`${styles.badge} ${styles.badgeSuccess}`}>
-                        In Progress
-                      </span>
-                    </div>
-                  </div>
-                </>
-              );
-            })()}
-            </>
-           )}
+                  </>
+                );
+              })()
+            ) : (
+              <div className={styles.noResults}></div>
+            )}
+          </div>
 
 
           </div>
