@@ -497,7 +497,21 @@ const Admin = () => {
       setLoading(false);
     }
   };
+const formatTime=(value)=>{
+const d=new Date(value.replace(' ','T'));
+const dd=String(d.getDate()).padStart(2,'0');
+const mm=String(d.getMonth()+1).padStart(2,'0');
+const yyyy=d.getFullYear();
 
+const hh=String(d.getHours()).padStart(2,'0');
+const min=String(d.getMinutes()).padStart(2,'0');
+const ss=String(d.getSeconds()).padStart(2,'0');
+let isAm=true;
+if(hh>11)isAm=false;
+  hh=hh%12;
+  hh=(!isAm&&hh==0)?'12':hh;
+  return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss}${isAm?'AM':'PM'}`;
+}
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -541,28 +555,28 @@ const Admin = () => {
           <div className={styles.navTitle}>Management</div>
           <button
             className={`${styles.navItem} ${currentSection === 'elections' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='elections'?'elections':'')}
+            onClick={() => setCurrentSection(currentSection!=='elections'?'elections':'overview')}
           >
             <span>🗳️</span>
             <span>Elections</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'candidates' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='candidates'?'candidates':'')}
+            onClick={() => setCurrentSection(currentSection!=='candidates'?'candidates':'overview')}
           >
             <span>👤</span>
             <span>Candidates</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'voters' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='voters'?'voters':'')}
+            onClick={() => setCurrentSection(currentSection!=='voters'?'voters':'overview')}
           >
             <span>👥</span>
             <span>Voters</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'votes' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='votes'?'votes':'')}
+            onClick={() => setCurrentSection(currentSection!=='votes'?'votes':'overview')}
           >
             <span>📈</span>
             <span>Vote Results</span>
@@ -690,10 +704,10 @@ const Admin = () => {
                           <td>{election.id || idx}</td>
                           <td>{election.electionName}</td>
                           <td>
-                            {`${election.startDate.slice(0, 10)}  ${election.startDate.slice(11)}`}
+                            {formatTime(election.startDate)}
                           </td>
                           <td>
-                            {`${election.endDate.slice(0, 10)}  ${election.endDate.slice(11)}`}
+                            {formatTime(election.endDate)}
                           </td>
                           <td className={styles.contractCell}>
                             {election.contractAddress}
@@ -1119,6 +1133,8 @@ const Admin = () => {
             {votersData.length > 0 && (
               <div className={styles.sectionCard}>
                 <h2 className={styles.sectionTitle}>
+                  <br />
+                  <br />
                   <span>📋</span> Voters Data
                 </h2>
                 <div className={styles.dataTable}>
@@ -1211,6 +1227,8 @@ const Admin = () => {
             {votesData.length > 0 && (
               <div className={styles.sectionCard}>
                 <h2 className={styles.sectionTitle}>
+                  <br />
+                  <br />
                   <span>📊</span> Vote Results
                 </h2>
                 <div className={styles.dataTable}>

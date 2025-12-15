@@ -338,7 +338,21 @@ const Voter = () => {
     }
   };
 
+const formatTime=(value)=>{
+const d=new Date(value.replace(' ','T'));
+const dd=String(d.getDate()).padStart(2,'0');
+const mm=String(d.getMonth()+1).padStart(2,'0');
+const yyyy=d.getFullYear();
 
+const hh=String(d.getHours()).padStart(2,'0');
+const min=String(d.getMinutes()).padStart(2,'0');
+const ss=String(d.getSeconds()).padStart(2,'0');
+let isAm=true;
+if(hh>11)isAm=false;
+  hh=hh%12;
+  hh=(!isAm&&hh==0)?'12':hh;
+  return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss}${isAm?'AM':'PM'}`;
+}
   return (
     <div className={styles.layout}>
       
@@ -699,14 +713,14 @@ const Voter = () => {
 
             <div className={styles.electionBody}>
               <div className={styles.electionMeta}>
-                <span>ID: {election.id}</span><br />
-                <span>Contract: {election.contractAddress}</span><br />
+                <span>ID: {election.id}</span>
+                <span>Contract: {election.contractAddress}</span>
                 <span>Type: {election.electionName}</span>
               </div>
 
               <div className={styles.electionDates}>
-                <span>Starts: {new Date(election.startDate).toLocaleString()}</span>
-                <span>Ends: {new Date(election.endDate).toLocaleString()}</span>
+                <span>Starts: {formatTime(election.startDate)}</span>
+                <span>Ends: {formatTime(election.endDate)}</span>
               </div>
               
             </div>
