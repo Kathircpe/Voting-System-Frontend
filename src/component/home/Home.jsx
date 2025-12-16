@@ -50,7 +50,7 @@ const Home = () => {
           <button onClick={() => handleNavigation('/login')}>Log In</button>
           <button onClick={() => handleNavigation('/signup')}>Sign Up</button>
           <button onClick={() => handleNavigation('/documentation')}>Documentation</button>
-          <button disabled>Help (coming soon)</button>
+          <button onClick={()=> window.open('https://youtube.com','_blank','noopener,noreferrer')}>Demo video</button>
         </nav>
       </header>
 
@@ -126,128 +126,271 @@ const Home = () => {
 
           <div className="device" role="img" aria-label="Animated mockup">
             <div className="screen">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {/* Header Section */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px',
+                marginBottom: '16px'
+              }}>
                 <div
                   style={{
                     width: '54px',
                     height: '54px',
-                    borderRadius: '10px',
-                    background: 'linear-gradient(135deg,var(--accent-1),var(--accent-2))',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
                     display: 'grid',
                     placeItems: 'center',
-                    fontWeight: 700,
+                    fontWeight: 800,
+                    fontSize: '16px',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
                   }}
                 >
-                  ECI
+                  🗳️
                 </div>
                 <div style={{ flex: 1 }}>
                   <div
                     style={{
-                      height: '10px',
-                      background: 'rgba(255,255,255,0.03)',
-                      borderRadius: '6px',
-                      marginBottom: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      paddingInline: '4px',
-                      fontSize: '10px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: 'rgba(255,255,255,0.95)',
+                      marginBottom: '4px',
                     }}
                   >
-                    Election Commission of
+                    Election Commission
                   </div>
                   <div
                     style={{
-                      height: '8px',
-                      width: '68%',
-                      background: 'rgba(255,255,255,0.02)',
-                      borderRadius: '6px',
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.6)',
                       display: 'flex',
                       alignItems: 'center',
-                      paddingInline: '4px',
-                      fontSize: '9px',
+                      gap: '4px',
                     }}
                   >
-                    India
+                    <span style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      background: '#22c55e',
+                      animation: 'pulse 2s ease-in-out infinite',
+                    }}></span>
+                    Live Dashboard
                   </div>
                 </div>
               </div>
 
-              <div
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  gap: '10px',
-                }}
-              >
-                <div
-                  style={{
-                    height: '10px',
-                    width: '92%',
-                    background:
-                      'linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
-                    borderRadius: '6px',
-                    transform: 'translateX(-2px)',
-                    animation: 'screenShimmer 10s linear infinite',
-                  }}
-                ></div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <div
-                    style={{
-                      flex: 1,
-                      height: '76px',
-                      background:
-                        'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))',
-                      borderRadius: '10px',
-                      padding: '8px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: '8px',
-                        width: '60%',
-                        background: 'rgba(255,255,255,0.02)',
-                        borderRadius: '6px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        paddingInline: '4px',
-                        fontSize: '9px',
-                      }}
-                    >
-                      Polling percentage
-                    </div>
-                    <div
-                      style={{
-                        height: '8px',
-                        width: '80%',
-                        background: 'rgba(255,255,255,0.02)',
-                        borderRadius: '6px',
-                      }}
-                    ></div>
+              {/* Stats Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '10px',
+                marginBottom: '12px',
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05))',
+                  borderRadius: '12px',
+                  padding: '12px',
+                  border: '1px solid rgba(34, 197, 94, 0.2)',
+                }}>
+                  <div style={{
+                    fontSize: '9px',
+                    color: 'rgba(255,255,255,0.6)',
+                    marginBottom: '6px',
+                  }}>
+                    Total Voters
                   </div>
-                  <div
-                    style={{
-                      width: '70px',
-                      height: '70px',
-                      borderRadius: '10px',
-                      background: 'linear-gradient(135deg,var(--accent-2),var(--accent-1))',
+                  <div style={{
+                    fontSize: '18px',
+                    fontWeight: 800,
+                    color: '#22c55e',
+                  }}>
+                    950M+
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))',
+                  borderRadius: '12px',
+                  padding: '12px',
+                  border: '1px solid rgba(59, 130, 246, 0.2)',
+                }}>
+                  <div style={{
+                    fontSize: '9px',
+                    color: 'rgba(255,255,255,0.6)',
+                    marginBottom: '6px',
+                  }}>
+                    Active Elections
+                  </div>
+                  <div style={{
+                    fontSize: '18px',
+                    fontWeight: 800,
+                    color: '#3b82f6',
+                  }}>
+                    24
+                  </div>
+                </div>
+              </div>
+
+              {/* Polling Percentage Card */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15))',
+                borderRadius: '14px',
+                padding: '14px',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                position: 'relative',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: '-20px',
+                  right: '-20px',
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent)',
+                  animation: 'float 6s ease-in-out infinite',
+                }}></div>
+                
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  position: 'relative',
+                  zIndex: 1,
+                }}>
+                  <div>
+                    <div style={{
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.7)',
+                      marginBottom: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}>
+                      <span>📊</span>
+                      National Turnout
+                    </div>
+                    <div style={{
+                      fontSize: '28px',
+                      fontWeight: 900,
+                      background: 'linear-gradient(135deg, #a855f7, #ec4899)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}>
+                      67.4%
+                    </div>
+                    <div style={{
+                      fontSize: '9px',
+                      color: 'rgba(255,255,255,0.5)',
+                      marginTop: '4px',
+                    }}>
+                      2024 General Elections
+                    </div>
+                  </div>
+
+                  <div style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    background: 'conic-gradient(#a855f7 0% 67.4%, rgba(255,255,255,0.1) 67.4% 100%)',
+                    display: 'grid',
+                    placeItems: 'center',
+                    position: 'relative',
+                  }}>
+                    <div style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.4)',
                       display: 'grid',
                       placeItems: 'center',
-                      fontWeight: 800,
-                      fontSize: '14px',
-                    }}
-                  >
-                    69.74%
+                      fontSize: '10px',
+                      fontWeight: 700,
+                    }}>
+                      ↑ 3%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div style={{
+                  marginTop: '12px',
+                  height: '6px',
+                  background: 'rgba(255,255,255,0.1)',
+                  borderRadius: '3px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}>
+                  <div style={{
+                    width: '67.4%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #a855f7, #ec4899)',
+                    borderRadius: '3px',
+                    animation: 'progressGrow 2s ease-out',
+                  }}></div>
+                </div>
+              </div>
+
+              {/* Quick Stats Row */}
+              <div style={{
+                display: 'flex',
+                gap: '8px',
+                marginTop: '12px',
+              }}>
+                <div style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.05)',
+                  borderRadius: '10px',
+                  padding: '10px',
+                  textAlign: 'center',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    color: '#f59e0b',
+                    marginBottom: '2px',
+                  }}>
+                    543
+                  </div>
+                  <div style={{
+                    fontSize: '8px',
+                    color: 'rgba(255,255,255,0.5)',
+                  }}>
+                    Lok Sabha Seats
+                  </div>
+                </div>
+
+                <div style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.05)',
+                  borderRadius: '10px',
+                  padding: '10px',
+                  textAlign: 'center',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    color: '#06b6d4',
+                    marginBottom: '2px',
+                  }}>
+                    28
+                  </div>
+                  <div style={{
+                    fontSize: '8px',
+                    color: 'rgba(255,255,255,0.5)',
+                  }}>
+                    States & UTs
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </aside>
+
       </main>
 
       <footer>

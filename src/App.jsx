@@ -9,10 +9,23 @@ import VerifyAccount from './component/auth/verifyAccount/verifyAccount.jsx'
 import Documentation from './component/documentation/documentation.jsx'
 import Admin from './component/dashboard/admin/admin.jsx'
 import Voter from './component/dashboard/voter/voter.jsx'
+import { useNavigate } from 'react-router-dom';
+import { setupFetchInterceptor, setNavigate  } from './setupFetchInterceptor';
+ setupFetchInterceptor();
 
+function NavigateSetup() {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    setNavigate(navigate);
+  }, [navigate]);
+
+  return null;
+}
 function App() {
   return(
     <BrowserRouter>
+    <NavigateSetup />
     <Routes>
       <Route path="/" element={<Home />} />
 

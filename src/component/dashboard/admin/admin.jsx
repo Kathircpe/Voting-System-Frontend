@@ -4,7 +4,6 @@ import styles from './admin.module.css';
 
 const Admin = () => {
   const navigate = useNavigate();
-
   // Auth check
   useEffect(() => {
     const user = localStorage.getItem('user');
@@ -795,24 +794,31 @@ const Admin = () => {
                   </div>
                   <div className={styles.inputGroup}>
                     {/* <label className={styles.inputLabel}>Start Date</label> */}
-                    <input
-                      type="datetime-local"
-                      className={styles.inputField}
-                      value={electionForm.startDate}
-                      onChange={(e) => setElectionForm({ ...electionForm, startDate: e.target.value })}
-                      placeholder="Start Date"
-                      title="Start Date"
-                    />
+                   <input 
+                    type="text"
+                    className={styles.inputField}
+                    value={electionForm.startDate}
+                    onChange={(e) => setElectionForm({...electionForm, startDate: e.target.value})}
+                    placeholder="Start Date"
+                    onFocus={(e) => e.target.type = 'datetime-local'}
+                    onBlur={(e) => {
+                      if (!e.target.value) e.target.type = 'text';
+                    }}
+                  />
+
                   </div>
                   <div className={styles.inputGroup}>
                     {/* <label className={styles.inputLabel}>End Date</label> */}
                     <input
-                      type="datetime-local"
+                      type="text"
                       className={styles.inputField}
                       value={electionForm.endDate}
                       onChange={(e) => setElectionForm({ ...electionForm, endDate: e.target.value })}
                       placeholder="End Date"
-                      title="End Date"
+                      onFocus={(e) => e.target.type = 'datetime-local'}
+                      onBlur={(e) => {
+                        if (!e.target.value) e.target.type = 'text';
+                      }}
                     />
                   </div>
                 </div>

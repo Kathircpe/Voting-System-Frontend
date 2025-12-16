@@ -5,11 +5,13 @@ import styles from './voter.module.css';
 
 const Voter = () => {
   const navigate = useNavigate();
+   
+  
   useEffect(() => {
     if (!localStorage.getItem('token')) {
       navigate('/login');
     }
-  });
+});
   
   const [currentSection, setCurrentSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -166,7 +168,6 @@ const Voter = () => {
       return await response;
     }
   };
-
 
   useEffect(() => {
     if (currentSection === 'elections') {
@@ -808,6 +809,13 @@ const Voter = () => {
                 <span>🗳️</span>
                 Vote Now
               </h3>
+              <button
+                className={`${styles.btn} ${styles.btnPrimary}`}
+                onClick={loadCandidates}
+                disabled={loading}
+              >
+                🔄 Refresh
+              </button>
 
               <div className={`${styles.alert} ${styles.alertInfo}`}>
                 <span>ℹ️</span>
