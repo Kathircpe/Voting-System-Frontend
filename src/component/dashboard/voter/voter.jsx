@@ -10,10 +10,7 @@ const Voter = () => {
       navigate('/login');
     }
   });
-  useEffect(()=>{
-    loadCandidates();
-  },[voteForm.id]);
-
+  
   const [currentSection, setCurrentSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
