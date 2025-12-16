@@ -32,6 +32,7 @@ api.interceptors.response.use(
         if(error.response?.status===403){
              const navigate=useNavigate();
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
             navigate('/login');
         }
         return Promise.reject(error);

@@ -34,29 +34,29 @@ const Admin = () => {
 
   // Form states
   const [electionForm, setElectionForm] = useState({
-    id :'',electionName: '', startDate: '', endDate: ''
+    id: '', electionName: '', startDate: '', endDate: ''
   });
   const [candidateForm, setCandidateForm] = useState({
     name: '', partyName: '', id: '', constituency: ''
   });
- 
+
   const [showElectionForm, setShowElectionForm] = useState(false);
   const [showCandidateForm, setShowCandidateForm] = useState(false);
   const [votersFormType, setVotersFormType] = useState(null);
 
-  const[showUpdateElection,setShowUpdateElection]=useState(false);
-  const[showDeleteElection,setShowDeleteElection]=useState(false);
-  const[showDeleteCandidate,setShowDeleteCandidate]=useState(false);
-  const[showUpdateCandidate,setShowUpdateCandidate]=useState(false);
+  const [showUpdateElection, setShowUpdateElection] = useState(false);
+  const [showDeleteElection, setShowDeleteElection] = useState(false);
+  const [showDeleteCandidate, setShowDeleteCandidate] = useState(false);
+  const [showUpdateCandidate, setShowUpdateCandidate] = useState(false);
 
-  
+
   // IDs for update/delete
   const [updateElectionId, setUpdateElectionId] = useState('');
   const [deleteElectionId, setDeleteElectionId] = useState('');
   const [updateCandidateId, setUpdateCandidateId] = useState('');
   const [deleteCandidateId, setDeleteCandidateId] = useState('');
   const [voterId, setVoterId] = useState('');
-  const[secondElectionId,setSecondElectionId]=useState('');
+  const [secondElectionId, setSecondElectionId] = useState('');
   const [electionId, setElectionId] = useState('');
   const [candidateIdForVotes, setCandidateIdForVotes] = useState('');
 
@@ -171,7 +171,7 @@ const Admin = () => {
     // Voters
     getAllVoters: async (page) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/getVoters/${page-1}`, {
+      const response = await fetch(`${API_BASE_URL}/getVoters/${page - 1}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -207,16 +207,16 @@ const Admin = () => {
       return await response.json();
     },
 
-    getSingleCandidateVotes: async (id,candidateId) => {
+    getSingleCandidateVotes: async (id, candidateId) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/getVotes?id=${id}&candidateId${candidateId}`, {
+      const response = await fetch(`${API_BASE_URL}/getVotes?id=${id}&candidateId=${candidateId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      return await response.json();
+      return await response;
     }
   };
 
@@ -240,11 +240,6 @@ const Admin = () => {
         apiCalls.getAllElections(),
         apiCalls.getAllCandidates()
       ]);
-      elections.forEach(async (e)=>{
-       const response= await apiCalls.handleGetAllVotes(e.id);
-       console.log(reponse);
-      setVotersData(votersData+Array.isArray(response) ? response.length : 0);
-      });     
       setElections(Array.isArray(electionsData) ? electionsData : []);
       setCandidates(Array.isArray(candidatesData) ? candidatesData : []);
 
@@ -279,13 +274,11 @@ const Admin = () => {
     }
   };
 
-  const emptyElectionForm=()=>{
-      setElectionForm({id:'', electionName: '', startDate: '', endDate: '' });
+  const emptyElectionForm = () => {
+    setElectionForm({ id: '', electionName: '', startDate: '', endDate: '' });
 
   }
-  function emptyCandidateForm(){
-    setCandidateForm({name: '', partyName: '', id: '', constituency: ''});
-  }
+
   // Election handlers
   const handleCreateElection = async (e) => {
     e.preventDefault();
@@ -298,8 +291,8 @@ const Admin = () => {
       setLoading(true);
       await apiCalls.createElection(electionForm);
       setMessage({ type: 'success', text: 'Election created successfully!' });
-     emptyElectionForm();
-     setTimeout(() => setMessage(null), 5000);
+      emptyElectionForm();
+      setTimeout(() => setMessage(null), 5000);
       loadElections();
       setShowElectionForm(false);
     } catch (error) {
@@ -318,11 +311,11 @@ const Admin = () => {
 
     try {
       setLoading(true);
-      await apiCalls.updateElection( electionForm);
+      await apiCalls.updateElection(electionForm);
       setMessage({ type: 'success', text: `Election ${electionForm.id} updated successfully!` });
       setUpdateElectionId('');
-     emptyElectionForm();
-     setTimeout(() => setMessage(null), 5000);
+      emptyElectionForm();
+      setTimeout(() => setMessage(null), 5000);
       loadElections();
     } catch (error) {
       setMessage({ type: 'error', text: error.response.data || 'Failed to update election' });
@@ -342,7 +335,7 @@ const Admin = () => {
       setLoading(true);
       await apiCalls.deleteElection(electionForm.id.trim());
       setMessage({ type: 'success', text: `Election ${electionForm.id} deleted!` });
-     setDeleteElectionId('');
+      setDeleteElectionId('');
       setTimeout(() => setMessage(null), 5000);
       loadElections();
     } catch (error) {
@@ -362,9 +355,9 @@ const Admin = () => {
 
     try {
       setLoading(true);
-      const response =await apiCalls.createCandidate(candidateForm);
+      const response = await apiCalls.createCandidate(candidateForm);
       setMessage({ type: 'success', text: 'Candidate created successfully!' });
-      setCandidateForm({id:'', name: '', partyName: '', constituency: '' });
+      setCandidateForm({ id: '', name: '', partyName: '', constituency: '' });
       setTimeout(() => setMessage(null), 5000);
       loadCandidates();
       setShowCandidateForm(false);
@@ -381,21 +374,21 @@ const Admin = () => {
       setMessage({ type: 'error', text: 'Please enter Candidate ID' });
       return;
     }
-    if(!candidateForm.name&&!candidateForm.partyName&&!candidateForm.constituency){
+    if (!candidateForm.name && !candidateForm.partyName && !candidateForm.constituency) {
       setMessage({ type: 'error', text: 'Please enter atleast one detail' });
       return;
     }
 
-    let data={id:candidateForm.id};
-      if(candidateForm.name) data.name = candidateForm.name;
-      if(candidateForm.partyName) data.partyName = candidateForm.partyName;
-      if(candidateForm.constituency) data.constituency = candidateForm.constituency;
+    let data = { id: candidateForm.id };
+    if (candidateForm.name) data.name = candidateForm.name;
+    if (candidateForm.partyName) data.partyName = candidateForm.partyName;
+    if (candidateForm.constituency) data.constituency = candidateForm.constituency;
     try {
       setLoading(true);
       await apiCalls.updateCandidate(data);
       setMessage({ type: 'success', text: `Candidate ${data.id} updated successfully!` });
       setUpdateCandidateId('');
-      setCandidateForm({ id:'',name: '', partyName: '',constituency: '' });
+      setCandidateForm({ id: '', name: '', partyName: '', constituency: '' });
       setTimeout(() => setMessage(null), 5000);
       loadCandidates();
     } catch (error) {
@@ -474,7 +467,7 @@ const Admin = () => {
       const data = await apiCalls.getAllVotes(electionId.trim());
       setVotesData(Array.isArray(data) ? data : []);
     } catch (error) {
-      setMessage({ type: 'error', text: error.response?.data||'failed to fetch' });
+      setMessage({ type: 'error', text: error.response?.data || 'failed to fetch' });
       setVotesData([]);
     } finally {
       setLoading(false);
@@ -486,33 +479,33 @@ const Admin = () => {
       setMessage({ type: 'error', text: 'Please fill all fields' });
       return;
     }
-    
+
     try {
       setLoading(true);
-      const data = await apiCalls.getSingleCandidateVotes(secondElectionId,candidateIdForVotes);
+      const data = await apiCalls.getSingleCandidateVotes(secondElectionId, candidateIdForVotes);
       setVotesData(Array.isArray(data) ? data : [data]);
     } catch (error) {
-      setMessage({ type: 'error', text: error.response?.data||error.message|| 'Failed to fetch candidate votes' });
+      setMessage({ type: 'error', text: error.response?.data || error.message || 'Failed to fetch candidate votes' });
       setVotesData([]);
     } finally {
       setLoading(false);
     }
   };
-const formatTime=(value)=>{
-const d=new Date(value.replace(' ','T'));
-const dd=String(d.getDate()).padStart(2,'0');
-const mm=String(d.getMonth()+1).padStart(2,'0');
-const yyyy=d.getFullYear();
+  const formatTime = (value) => {
+    const d = new Date(value.replace(' ', 'T'));
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
 
-let hh=String(d.getHours()).padStart(2,'0');
-const min=String(d.getMinutes()).padStart(2,'0');
-const ss=String(d.getSeconds()).padStart(2,'0');
-let isAm=true;
-if(hh>11)isAm=false;
-  hh=hh%12;
-  hh=(!isAm&&hh==0)?'12':hh;
-  return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss} ${isAm?'AM':'PM'}`;
-}
+    let hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    let isAm = true;
+    if (hh > 11) isAm = false;
+    hh = hh % 12;
+    hh = (!isAm && hh == 0) ? '12' : hh;
+    return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss} ${isAm ? 'AM' : 'PM'}`;
+  }
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -521,8 +514,8 @@ if(hh>11)isAm=false;
 
   return (
     <div className={styles.adminLayout}>
-      <button 
-        className={styles.mobileToggle} 
+      <button
+        className={styles.mobileToggle}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         ☰
@@ -545,7 +538,7 @@ if(hh>11)isAm=false;
           <div className={styles.navTitle}>Dashboard</div>
           <button
             className={`${styles.navItem} ${currentSection === 'overview' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='overview'?'overview':'')}
+            onClick={() => setCurrentSection(currentSection !== 'overview' ? 'overview' : '')}
           >
             <span>📊</span>
             <span>Overview</span>
@@ -556,28 +549,28 @@ if(hh>11)isAm=false;
           <div className={styles.navTitle}>Management</div>
           <button
             className={`${styles.navItem} ${currentSection === 'elections' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='elections'?'elections':'overview')}
+            onClick={() => setCurrentSection(currentSection !== 'elections' ? 'elections' : 'overview')}
           >
             <span>🗳️</span>
             <span>Elections</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'candidates' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='candidates'?'candidates':'overview')}
+            onClick={() => setCurrentSection(currentSection !== 'candidates' ? 'candidates' : 'overview')}
           >
             <span>👤</span>
             <span>Candidates</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'voters' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='voters'?'voters':'overview')}
+            onClick={() => setCurrentSection(currentSection !== 'voters' ? 'voters' : 'overview')}
           >
             <span>👥</span>
             <span>Voters</span>
           </button>
           <button
             className={`${styles.navItem} ${currentSection === 'votes' ? styles.navItemActive : ''}`}
-            onClick={() => setCurrentSection(currentSection!=='votes'?'votes':'overview')}
+            onClick={() => setCurrentSection(currentSection !== 'votes' ? 'votes' : 'overview')}
           >
             <span>📈</span>
             <span>Vote Results</span>
@@ -634,7 +627,7 @@ if(hh>11)isAm=false;
           <div>
             <div className={styles.pageHeader}>
               <h1 className={styles.pageTitle}>Election Management</h1>
-              <button 
+              <button
                 className={`${styles.btn} ${styles.btnPrimary}`}
                 onClick={loadElections}
                 disabled={loading}
@@ -647,29 +640,29 @@ if(hh>11)isAm=false;
             <div className={styles.sectionCard}>
               <h2 className={styles.sectionTitle}><span>⚡</span> Election Management</h2>
               <div className={styles.crudBtnGroup}>
-                <button 
-                  className={`${styles.btn} ${styles.crudCreateBtn}`} 
+                <button
+                  className={`${styles.btn} ${styles.crudCreateBtn}`}
                   onClick={() => setShowElectionForm(true)}
                   disabled={loading}
                 >
                   ➕ Create Election
                 </button>
-                <button 
-                  className={`${styles.btn} ${styles.crudUpdateBtn}`} 
+                <button
+                  className={`${styles.btn} ${styles.crudUpdateBtn}`}
                   onClick={() => setShowUpdateElection(true)}
                   disabled={loading}
                 >
                   ✏️ Update Election
                 </button>
-                <button 
-                  className={`${styles.btn} ${styles.crudDeleteBtn}`} 
+                <button
+                  className={`${styles.btn} ${styles.crudDeleteBtn}`}
                   onClick={() => setShowDeleteElection(true)}
                   disabled={loading}
                 >
                   🗑️ Delete Election
                 </button>
-                <button 
-                  className={`${styles.btn} ${styles.crudRefreshBtn}`} 
+                <button
+                  className={`${styles.btn} ${styles.crudRefreshBtn}`}
                   onClick={loadElections}
                   disabled={loading}
                 >
@@ -700,7 +693,7 @@ if(hh>11)isAm=false;
                       </tr>
                     </thead>
                     <tbody>
-                      {elections.sort((a,b)=>a.id-b.id).map((election, idx) => (
+                      {elections.sort((a, b) => a.id - b.id).map((election, idx) => (
                         <tr key={idx}>
                           <td>{election.id || idx}</td>
                           <td>{election.electionName}</td>
@@ -721,7 +714,7 @@ if(hh>11)isAm=false;
               </div>
             )}
 
-             {/* Election Forms */}
+            {/* Election Forms */}
             {showElectionForm && (
               <div className={styles.inputForm}>
                 <br />
@@ -729,33 +722,37 @@ if(hh>11)isAm=false;
                 <form onSubmit={handleCreateElection}>
                   <div className={styles.formRow}>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Election Name</label>
+                      {/* <label className={styles.inputLabel}>Election Name</label> */}
                       <input
                         type="text"
                         className={styles.inputField}
                         value={electionForm.electionName}
-                        onChange={(e) => setElectionForm({...electionForm, electionName: e.target.value})}
+                        onChange={(e) => setElectionForm({ ...electionForm, electionName: e.target.value })}
                         placeholder="Presidential, Local, etc."
                         required
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>Start Date</label>
+                      {/* <label  className={styles.inputLabel}>Start Date</label> */}
                       <input
                         type="datetime-local"
                         className={styles.inputField}
                         value={electionForm.startDate}
-                        onChange={(e) => setElectionForm({...electionForm, startDate: e.target.value})}
+                        onChange={(e) => setElectionForm({ ...electionForm, startDate: e.target.value })}
+                        placeholder="Start Date"
+                        title="Start Date"
                         required
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label className={styles.inputLabel}>End Date</label>
+                      {/* <label  className={styles.inputLabel}>End Date</label> */}
                       <input
                         type="datetime-local"
                         className={styles.inputField}
                         value={electionForm.endDate}
-                        onChange={(e) => setElectionForm({...electionForm, endDate: e.target.value})}
+                        onChange={(e) => setElectionForm({ ...electionForm, endDate: e.target.value })}
+                        placeholder="End Date"
+                        title="End Date"
                         required
                       />
                     </div>
@@ -773,18 +770,18 @@ if(hh>11)isAm=false;
             )}
             {/* UPDATE ELECTION */}
             {showUpdateElection && (
-              
+
               <div className={styles.sectionCard}>
                 <br />
                 <h3 className={styles.formTitle}>✏️ Update Election</h3>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className={styles.inputField}
                   placeholder="Enter Election ID (e.g., 1)"
                   value={electionForm.id}
-                  onChange={(e) =>setElectionForm({...electionForm, id: e.target.value})}
+                  onChange={(e) => setElectionForm({ ...electionForm, id: e.target.value })}
                 />
-                
+
                 <div className={styles.formRow}>
                   <div className={styles.inputGroup}>
                     {/* <label className={styles.inputLabel}>Election Name</label> */}
@@ -792,7 +789,7 @@ if(hh>11)isAm=false;
                       type="text"
                       className={styles.inputField}
                       value={electionForm.electionName}
-                      onChange={(e) => setElectionForm({...electionForm, electionName: e.target.value})}
+                      onChange={(e) => setElectionForm({ ...electionForm, electionName: e.target.value })}
                       placeholder="Presidential, Local, etc."
                     />
                   </div>
@@ -802,7 +799,9 @@ if(hh>11)isAm=false;
                       type="datetime-local"
                       className={styles.inputField}
                       value={electionForm.startDate}
-                      onChange={(e) => setElectionForm({...electionForm, startDate: e.target.value})}
+                      onChange={(e) => setElectionForm({ ...electionForm, startDate: e.target.value })}
+                      placeholder="Start Date"
+                      title="Start Date"
                     />
                   </div>
                   <div className={styles.inputGroup}>
@@ -811,21 +810,23 @@ if(hh>11)isAm=false;
                       type="datetime-local"
                       className={styles.inputField}
                       value={electionForm.endDate}
-                      onChange={(e) => setElectionForm({...electionForm, endDate: e.target.value})}
+                      onChange={(e) => setElectionForm({ ...electionForm, endDate: e.target.value })}
+                      placeholder="End Date"
+                      title="End Date"
                     />
                   </div>
                 </div>
-                
+
                 <div className={styles.crudBtnGroup}>
-                  <button 
-                    className={`${styles.btn} ${styles.crudUpdateBtn}`} 
+                  <button
+                    className={`${styles.btn} ${styles.crudUpdateBtn}`}
                     onClick={handleUpdateElection}
                     disabled={loading || !electionForm.id.trim()}
                   >
                     Update Election
                   </button>
-                  <button 
-                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                  <button
+                    className={`${styles.btn} ${styles.btnSecondary}`}
                     onClick={() => setShowUpdateElection(false)}
                   >
                     Cancel
@@ -838,23 +839,23 @@ if(hh>11)isAm=false;
             {showDeleteElection && (
               <div className={styles.deleteConfirmSection}>
                 <h3 className={styles.formTitle}>🗑️ Delete Election</h3>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className={styles.deleteIdInput}
                   placeholder="Enter Election ID to Delete"
                   value={deleteElectionId}
-                  onChange={(e) => setDeleteElectionId( e.target.value)}
+                  onChange={(e) => setDeleteElectionId(e.target.value)}
                 />
                 <div className={styles.crudBtnGroup}>
-                  <button 
-                    className={`${styles.btn} ${styles.crudDeleteBtn}`} 
+                  <button
+                    className={`${styles.btn} ${styles.crudDeleteBtn}`}
                     onClick={handleDeleteElection}
                     disabled={loading || !deleteElectionId.trim()}
                   >
                     ⚠️ Confirm Delete
                   </button>
-                  <button 
-                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                  <button
+                    className={`${styles.btn} ${styles.btnSecondary}`}
                     onClick={() => setShowDeleteElection(false)}
                   >
                     Cancel
@@ -870,7 +871,7 @@ if(hh>11)isAm=false;
           <div>
             <div className={styles.pageHeader}>
               <h1 className={styles.pageTitle}>Candidate Management</h1>
-              <button 
+              <button
                 className={`${styles.btn} ${styles.btnPrimary}`}
                 onClick={loadCandidates}
                 disabled={loading}
@@ -899,35 +900,35 @@ if(hh>11)isAm=false;
 
             {/* Candidates List */}
             {!loading && candidates.length > 0 && (
-                <div className={styles.sectionCard}>
-                  <h2 className={styles.sectionTitle}>
-                    <span>👤</span> Candidates List
-                  </h2>
-                  <div className={styles.dataTable}>
-                    <table className={styles.responsiveTable}>
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Name</th>
-                          <th>Constituency</th>
-                          <th>Party</th>
+              <div className={styles.sectionCard}>
+                <h2 className={styles.sectionTitle}>
+                  <span>👤</span> Candidates List
+                </h2>
+                <div className={styles.dataTable}>
+                  <table className={styles.responsiveTable}>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Constituency</th>
+                        <th>Party</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {candidates.sort((a, b) => a.id - b.id).map((candidate, idx) => (
+                        <tr key={idx}>
+                          <td>{candidate.id || idx}</td>
+                          <td className={styles.wrapCell}>{candidate.name}</td>
+                          <td className={styles.wrapCell}>{candidate.constituency}</td>
+                          <td className={styles.wrapCell}>{candidate.partyName}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {candidates.sort((a,b)=>a.id-b.id).map((candidate, idx) => (
-                          <tr key={idx}>
-                            <td>{candidate.id || idx}</td>
-                            <td className={styles.wrapCell}>{candidate.name}</td>
-                            <td className={styles.wrapCell}>{candidate.constituency}</td>
-                            <td className={styles.wrapCell}>{candidate.partyName}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
+              </div>
             )}
-             {/* Candidate Forms */}
+            {/* Candidate Forms */}
             {showCandidateForm && (
               <div className={styles.inputForm}>
                 <br />
@@ -940,7 +941,7 @@ if(hh>11)isAm=false;
                         type="text"
                         className={styles.inputField}
                         value={candidateForm.name}
-                        onChange={(e) => setCandidateForm({...candidateForm, name: e.target.value})}
+                        onChange={(e) => setCandidateForm({ ...candidateForm, name: e.target.value })}
                         placeholder="Candidate full name"
                         required
                       />
@@ -951,24 +952,24 @@ if(hh>11)isAm=false;
                         type="text"
                         className={styles.inputField}
                         value={candidateForm.partyName}
-                        onChange={(e) => setCandidateForm({...candidateForm, partyName: e.target.value})}
+                        onChange={(e) => setCandidateForm({ ...candidateForm, partyName: e.target.value })}
                         placeholder="Political party"
                         required
                       />
                     </div>
-    
+
                     <div className={styles.inputGroup}>
                       {/* <label className={styles.inputLabel}>Constituency</label> */}
                       <input
                         type="text"
                         className={styles.inputField}
                         value={candidateForm.constituency}
-                        onChange={(e) => setCandidateForm({...candidateForm, constituency: e.target.value})}
+                        onChange={(e) => setCandidateForm({ ...candidateForm, constituency: e.target.value })}
                         placeholder="constituency"
                       />
                     </div>
                   </div>
-                 
+
                   <div className={styles.btnGroup}>
                     <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading}>
                       {loading ? 'Creating...' : 'Create Candidate'}
@@ -986,14 +987,14 @@ if(hh>11)isAm=false;
               <div className={styles.sectionCard}>
                 <br />
                 <h3 className={styles.formTitle}>✏️ Update Candidate</h3>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className={styles.updateIdInput}
                   placeholder="Enter Candidate ID (e.g., 1)"
                   value={candidateForm.id}
-                  onChange={(e) =>  setCandidateForm({...candidateForm, id: e.target.value})}
+                  onChange={(e) => setCandidateForm({ ...candidateForm, id: e.target.value })}
                 />
-                
+
                 <div className={styles.formRow}>
                   <div className={styles.inputGroup}>
                     {/* <label className={styles.inputLabel}>Name</label> */}
@@ -1001,7 +1002,7 @@ if(hh>11)isAm=false;
                       type="text"
                       className={styles.inputField}
                       value={candidateForm.name}
-                      onChange={(e) => setCandidateForm({...candidateForm, name: e.target.value})}
+                      onChange={(e) => setCandidateForm({ ...candidateForm, name: e.target.value })}
                       placeholder="Candidate full name"
                     />
                   </div>
@@ -1011,7 +1012,7 @@ if(hh>11)isAm=false;
                       type="text"
                       className={styles.inputField}
                       value={candidateForm.partyName}
-                      onChange={(e) => setCandidateForm({...candidateForm, partyName: e.target.value})}
+                      onChange={(e) => setCandidateForm({ ...candidateForm, partyName: e.target.value })}
                       placeholder="Political party"
                     />
                   </div>
@@ -1022,22 +1023,22 @@ if(hh>11)isAm=false;
                       type="text"
                       className={styles.inputField}
                       value={candidateForm.constituency}
-                      onChange={(e) => setCandidateForm({...candidateForm, constituency: e.target.value})}
-                      placeholder="President, VP, etc."
+                      onChange={(e) => setCandidateForm({ ...candidateForm, constituency: e.target.value })}
+                      placeholder="constituency"
                     />
                   </div>
                 </div>
-                
+
                 <div className={styles.crudBtnGroup}>
-                  <button 
-                    className={`${styles.btn} ${styles.crudUpdateBtn}`} 
+                  <button
+                    className={`${styles.btn} ${styles.crudUpdateBtn}`}
                     onClick={handleUpdateCandidate}
                     disabled={loading || !candidateForm.id.trim()}
                   >
                     Update Candidate
                   </button>
-                  <button 
-                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                  <button
+                    className={`${styles.btn} ${styles.btnSecondary}`}
                     onClick={() => setShowUpdateCandidate(false)}
                   >
                     Cancel
@@ -1050,23 +1051,23 @@ if(hh>11)isAm=false;
             {showDeleteCandidate && (
               <div className={styles.deleteConfirmSection}>
                 <h3 className={styles.formTitle}>🗑️ Delete Candidate</h3>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   className={styles.deleteIdInput}
                   placeholder="Enter Candidate ID to Delete"
                   value={deleteCandidateId}
                   onChange={(e) => setDeleteCandidateId(e.target.value)}
                 />
                 <div className={styles.crudBtnGroup}>
-                  <button 
-                    className={`${styles.btn} ${styles.crudDeleteBtn}`} 
+                  <button
+                    className={`${styles.btn} ${styles.crudDeleteBtn}`}
                     onClick={handleDeleteCandidate}
                     disabled={loading || !deleteCandidateId.trim()}
                   >
                     ⚠️ Confirm Delete
                   </button>
-                  <button 
-                    className={`${styles.btn} ${styles.btnSecondary}`} 
+                  <button
+                    className={`${styles.btn} ${styles.btnSecondary}`}
                     onClick={() => setShowDeleteCandidate(false)}
                   >
                     Cancel
@@ -1087,7 +1088,7 @@ if(hh>11)isAm=false;
 
             <div className={styles.inputForm}>
               <h3 className={styles.formTitle}><span>👥</span> Voter Actions</h3>
-              
+              <h4>#th 10 voters : </h4>
               {/* Get All Voters */}
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
@@ -1101,8 +1102,8 @@ if(hh>11)isAm=false;
                   />
                 </div>
               </div>
-              <button 
-                className={`${styles.btn} ${styles.btnPrimary}`} 
+              <button
+                className={`${styles.btn} ${styles.btnPrimary}`}
                 onClick={handleGetAllVoters}
                 disabled={loading}
               >
@@ -1110,7 +1111,7 @@ if(hh>11)isAm=false;
               </button>
 
               {/* Get Single Voter */}
-              <div style={{marginTop: '20px'}}>
+              <div style={{ marginTop: '20px' }}>
                 <div className={styles.formRow}>
                   <input
                     type="text"
@@ -1119,8 +1120,8 @@ if(hh>11)isAm=false;
                     value={voterId}
                     onChange={(e) => setVoterId(e.target.value)}
                   />
-                  <button 
-                    className={`${styles.btn} ${styles.btnInfo}`} 
+                  <button
+                    className={`${styles.btn} ${styles.btnInfo}`}
                     onClick={handleGetSingleVoter}
                     disabled={loading || !voterId.trim()}
                   >
@@ -1151,14 +1152,14 @@ if(hh>11)isAm=false;
                       </tr>
                     </thead>
                     <tbody>
-                      {votersData.sort((a,b)=>a.id-b.id).map((voter, idx) => (
+                      {votersData.sort((a, b) => a.id - b.id).map((voter, idx) => (
                         <tr key={idx}>
                           <td>{voter.id}</td>
                           <td className={styles.wrapCell}>{voter.name}</td>
                           <td className={styles.wrapCell}>{voter.email}</td>
                           <td className={styles.wrapCell}>{voter.phoneNumber}</td>
-                          <td className={styles.wrapCell}>{voter.hasVoted?'YES':'NO'}</td>
-                          <td className={styles.wrapCell}>{voter.isEnabled?'YES':'NO'}</td>
+                          <td className={styles.wrapCell}>{voter.hasVoted ? 'YES' : 'NO'}</td>
+                          <td className={styles.wrapCell}>{voter.isEnabled ? 'YES' : 'NO'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1178,7 +1179,7 @@ if(hh>11)isAm=false;
 
             <div className={styles.inputForm}>
               <h3 className={styles.formTitle}><span>📈</span> Vote Analytics</h3>
-              
+
               {/* Get All Votes */}
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
@@ -1191,8 +1192,8 @@ if(hh>11)isAm=false;
                     onChange={(e) => setElectionId(e.target.value)}
                   />
                 </div>
-                <button 
-                  className={`${styles.btn} ${styles.btnPrimary}`} 
+                <button
+                  className={`${styles.btn} ${styles.btnPrimary}`}
                   onClick={handleGetAllVotes}
                   disabled={loading || !electionId.trim()}
                 >
@@ -1201,7 +1202,7 @@ if(hh>11)isAm=false;
               </div>
 
               {/* Get Single Candidate Votes */}
-              <div style={{marginTop: '20px'}}>
+              <div style={{ marginTop: '20px' }}>
                 <div className={styles.formRow}>
                   <input
                     type="text"
@@ -1217,8 +1218,8 @@ if(hh>11)isAm=false;
                     value={candidateIdForVotes}
                     onChange={(e) => setCandidateIdForVotes(e.target.value)}
                   />
-                  <button 
-                    className={`${styles.btn} ${styles.btnInfo}`} 
+                  <button
+                    className={`${styles.btn} ${styles.btnInfo}`}
                     onClick={handleGetSingleVotes}
                     disabled={loading || !secondElectionId.trim() || !candidateIdForVotes.trim()}
                   >

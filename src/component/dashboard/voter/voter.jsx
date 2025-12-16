@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './voter.module.css';
 
 
 const Voter = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   useEffect(() => {
-    if(!localStorage.getItem('token')){
+    if (!localStorage.getItem('token')) {
       navigate('/login');
     }
-  }); 
+  });
+  useEffect(()=>{
+    loadCandidates();
+  },[voteForm.id]);
 
-  
   const [currentSection, setCurrentSection] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : { 
-      name: 'Guest', 
+    return savedUser ? JSON.parse(savedUser) : {
+      name: 'Guest',
       id: 'N/A',
-      email: 'N/A', 
+      email: 'N/A',
       phoneNumber: 'N/A'
     };
   });
@@ -40,10 +42,10 @@ const Voter = () => {
 
   // Profile State
   const [voterDetails, setVoterDetails] = useState({
-    name: 'N/A', 
+    name: 'N/A',
     id: 'N/A'
-    }
-    );
+  }
+  );
   const [searchVoterId, setSearchVoterId] = useState('');
 
 
@@ -71,7 +73,7 @@ const Voter = () => {
 
   // Update Profile State
   const [updateForm, setUpdateForm] = useState({
-    id:user.id,
+    id: user.id,
     name: '',
     email: '',
     phone: '',
@@ -94,7 +96,7 @@ const Voter = () => {
           'Content-Type': 'application/json'
         }
       });
-      
+
       return await response.json();
     },
 
@@ -129,15 +131,15 @@ const Voter = () => {
 
     castVote: async (data) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/votes/vote`, {
-        method: 'POST',
+      const response = await fetch(`${API_BASE_URL}/vote`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       });
-      return await response.json();
+      return await response;
     },
 
 
@@ -154,7 +156,7 @@ const Voter = () => {
     },
 
 
-    updateVoter: async ( data) => {
+    updateVoter: async (data) => {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/updateVoter`, {
         method: 'PATCH',
@@ -190,7 +192,7 @@ const Voter = () => {
       setMessage({ type: 'error', text: 'Please enter your Voter ID' });
       return;
     }
-    
+
     try {
       setLoading(true);
       const data = await apiCalls.getVoterDetails(voterId);
@@ -260,14 +262,14 @@ const Voter = () => {
       await apiCalls.castVote({
         id: voteForm.id,
         candidateId: voteForm.candidateId,
-        voterId: voterDetails.id
+        voterId: user.id
       });
       setVoteMessage({ type: 'success', text: 'Your vote has been successfully recorded! Thank you for participating.' });
       setVoteForm({ id: '', candidateId: '', confirmCandidateId: '' });
       setTimeout(() => setVoteMessage(null), 7000);
       setMessage(null);
     } catch (error) {
-      setVoteMessage({ type: 'error', text: error.response.data || 'Failed to cast vote. Please try again.' });
+      setVoteMessage({ type: 'error', text: error.response?.data || error.message || 'Failed to cast vote. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -299,7 +301,7 @@ const Voter = () => {
 
 
     const updateData = {};
-    updateData.id=updateForm.id;
+    updateData.id = updateForm.id;
     if (updateForm.name.trim()) updateData.name = updateForm.name.trim();
     if (updateForm.email.trim()) updateData.email = updateForm.email.trim();
     if (updateForm.phone.trim()) updateData.phone = updateForm.phone.trim();
@@ -327,7 +329,7 @@ const Voter = () => {
 
     try {
       setLoading(true);
-      await apiCalls.updateVoter( updateData);
+      await apiCalls.updateVoter(updateData);
       setUpdateMessage({ type: 'success', text: 'Profile updated successfully! Changes will be reflected shortly.' });
       setTimeout(() => setUpdateMessage(null), 5000);
       setMessage(null);
@@ -338,25 +340,25 @@ const Voter = () => {
     }
   };
 
-const formatTime=(value)=>{
-const d=new Date(value.replace(' ','T'));
-const dd=String(d.getDate()).padStart(2,'0');
-const mm=String(d.getMonth()+1).padStart(2,'0');
-const yyyy=d.getFullYear();
+  const formatTime = (value) => {
+    const d = new Date(value.replace(' ', 'T'));
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
 
-let hh=String(d.getHours()).padStart(2,'0');
-const min=String(d.getMinutes()).padStart(2,'0');
-const ss=String(d.getSeconds()).padStart(2,'0');
-let isAm=true;
-if(hh>11)isAm=false;
-  hh=hh%12;
-  hh=(!isAm&&hh==0)?'12':hh;
-  return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss} ${isAm?'AM':'PM'}`;
-}
+    let hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    let isAm = true;
+    if (hh > 11) isAm = false;
+    hh = hh % 12;
+    hh = (!isAm && hh == 0) ? '12' : hh;
+    return `${dd}/${mm}/${yyyy}, ${hh}:${min}:${ss} ${isAm ? 'AM' : 'PM'}`;
+  }
   return (
     <div className={styles.layout}>
-      
-      <button 
+
+      <button
         className={styles.mobileToggle}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
@@ -394,12 +396,12 @@ if(hh>11)isAm=false;
         <div className={styles.navSection}>
           <div className={styles.navTitle}>Actions</div>
           <button
-    className={`${styles.navItem} ${currentSection === 'myProfile' ? styles.navItemActive : ''}`}
-    onClick={() => setCurrentSection('myProfile')}
-  >
-    <span>👤</span>
-    <span>My Profile</span>
-  </button>
+            className={`${styles.navItem} ${currentSection === 'myProfile' ? styles.navItemActive : ''}`}
+            onClick={() => setCurrentSection('myProfile')}
+          >
+            <span>👤</span>
+            <span>My Profile</span>
+          </button>
           <button
             className={`${styles.navItem} ${currentSection === 'candidates' ? styles.navItemActive : ''}`}
             onClick={() => setCurrentSection('candidates')}
@@ -408,12 +410,12 @@ if(hh>11)isAm=false;
             <span>View Candidates</span>
           </button>
           <button
-  className={`${styles.navItem} ${currentSection === 'elections' ? styles.navItemActive : ''}`}
-  onClick={() => setCurrentSection('elections')}
->
-  <span>🗂️</span>
-  <span>View Elections</span>
-</button>
+            className={`${styles.navItem} ${currentSection === 'elections' ? styles.navItemActive : ''}`}
+            onClick={() => setCurrentSection('elections')}
+          >
+            <span>🗂️</span>
+            <span>View Elections</span>
+          </button>
 
 
           <button
@@ -431,12 +433,12 @@ if(hh>11)isAm=false;
             <span>Vote Results</span>
           </button>
           <button
-    className={`${styles.navItem} ${currentSection === 'searchVoter' ? styles.navItemActive : ''}`}
-    onClick={() => setCurrentSection('searchVoter')}
-  >
-    <span>🔍</span>
-    <span>Search Voter</span>
-  </button>
+            className={`${styles.navItem} ${currentSection === 'searchVoter' ? styles.navItemActive : ''}`}
+            onClick={() => setCurrentSection('searchVoter')}
+          >
+            <span>🔍</span>
+            <span>Search Voter</span>
+          </button>
           <button
             className={`${styles.navItem} ${currentSection === 'update' ? styles.navItemActive : ''}`}
             onClick={() => setCurrentSection('update')}
@@ -449,8 +451,8 @@ if(hh>11)isAm=false;
 
         <div className={styles.navSection}>
           <div className={styles.navTitle}>Account</div>
-          <button 
-            className={styles.navItem} 
+          <button
+            className={styles.navItem}
             onClick={() => {
               localStorage.removeItem('token');
               localStorage.removeItem('user');
@@ -483,7 +485,7 @@ if(hh>11)isAm=false;
                 <h1 className={styles.pageTitle}>Welcome Back, {user.name}!</h1>
                 <p className={styles.pageSubtitle}>Your voting dashboard is ready</p>
               </div>
-              <button 
+              <button
                 className={`${styles.btn} ${styles.btnPrimary}`}
                 onClick={() => setCurrentSection('vote')}
               >
@@ -556,184 +558,184 @@ if(hh>11)isAm=false;
           </div>
         )}
 
-       {/* My Profile Section - Local Storage Data */}
-{currentSection === 'myProfile' && (
-  <div>
-    <div className={styles.pageHeader}>
-      <div>
-        <h1 className={styles.pageTitle}>My Profile</h1>
-        <p className={styles.pageSubtitle}>Your voter information</p>
-      </div>
-    </div>
-
-    <div className={styles.infoCard}>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Voter ID</span>
-        <span className={styles.infoValue}>{user.id}</span>
-      </div>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Name</span>
-        <span className={styles.infoValue}>{user.name}</span>
-      </div>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Email</span>
-        <span className={styles.infoValue}>{user.email}</span>
-      </div>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Phone</span>
-        <span className={styles.infoValue}>{user.phoneNumber}</span>
-      </div><div className={styles.infoRow}>
-        <span className={styles.infoLabel}>age</span>
-        <span className={styles.infoValue}>{user.age}</span>
-      </div>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Has Voted</span>
-        <span className={styles.infoValue}>{user.hasVoted?'Yes':'No'}</span>
-      </div>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Ethereum wallet Address</span>
-        <span className={styles.infoValue} style={{fontSize:"12px"}} >{user.voterAddress}</span>
-      </div>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Account Status</span>
-        <span className={`${styles.badge} ${styles.badgeSuccess}`}>Active</span>
-      </div>
-      <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
-        <span className={styles.infoLabel}>Last Login</span>
-        <span className={styles.infoValue}>{new Date().toLocaleDateString()}</span>
-      </div>
-    </div>
-
-    <div className={styles.sectionCard}>
-      <h2 className={styles.sectionTitle}>
-        <span>✏️</span>
-        Quick Actions
-      </h2>
-      <div className={styles.actionGrid}>
-        <div className={styles.actionCard} onClick={() => setCurrentSection('update')}>
-          <div className={styles.actionIcon}>🔧</div>
+        {/* My Profile Section - Local Storage Data */}
+        {currentSection === 'myProfile' && (
           <div>
-            <div className={styles.actionTitle}>Update Profile</div>
-            <div className={styles.actionDescription}>Modify your details</div>
+            <div className={styles.pageHeader}>
+              <div>
+                <h1 className={styles.pageTitle}>My Profile</h1>
+                <p className={styles.pageSubtitle}>Your voter information</p>
+              </div>
+            </div>
+
+            <div className={styles.infoCard}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Voter ID</span>
+                <span className={styles.infoValue}>{user.id}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Name</span>
+                <span className={styles.infoValue}>{user.name}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Email</span>
+                <span className={styles.infoValue}>{user.email}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Phone</span>
+                <span className={styles.infoValue}>{user.phoneNumber}</span>
+              </div><div className={styles.infoRow}>
+                <span className={styles.infoLabel}>age</span>
+                <span className={styles.infoValue}>{user.age}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Has Voted</span>
+                <span className={styles.infoValue}>{user.hasVoted ? 'Yes' : 'No'}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Ethereum wallet Address</span>
+                <span className={styles.infoValue} style={{ fontSize: "12px" }} >{user.voterAddress}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Account Status</span>
+                <span className={`${styles.badge} ${styles.badgeSuccess}`}>Active</span>
+              </div>
+              <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
+                <span className={styles.infoLabel}>Last Login</span>
+                <span className={styles.infoValue}>{new Date().toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            <div className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}>
+                <span>✏️</span>
+                Quick Actions
+              </h2>
+              <div className={styles.actionGrid}>
+                <div className={styles.actionCard} onClick={() => setCurrentSection('update')}>
+                  <div className={styles.actionIcon}>🔧</div>
+                  <div>
+                    <div className={styles.actionTitle}>Update Profile</div>
+                    <div className={styles.actionDescription}>Modify your details</div>
+                  </div>
+                </div>
+                <div className={styles.actionCard} onClick={() => setCurrentSection('searchVoter')}>
+                  <div className={styles.actionIcon}>🔍</div>
+                  <div>
+                    <div className={styles.actionTitle}>Search Other Voters</div>
+                    <div className={styles.actionDescription}>Find voter by ID</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className={styles.actionCard} onClick={() => setCurrentSection('searchVoter')}>
-          <div className={styles.actionIcon}>🔍</div>
+        )}
+        {/* Search Voter Section - API Lookup */}
+        {currentSection === 'searchVoter' && (
           <div>
-            <div className={styles.actionTitle}>Search Other Voters</div>
-            <div className={styles.actionDescription}>Find voter by ID</div>
+            <div className={styles.pageHeader}>
+              <div>
+                <h1 className={styles.pageTitle}>Search Voter</h1>
+                <p className={styles.pageSubtitle}>Find voter details by ID</p>
+              </div>
+            </div>
+
+            <div className={styles.inputForm}>
+              <h3 className={styles.formTitle}>
+                <span>🔍</span>
+                Search Voter Details
+              </h3>
+
+              <input
+                type="text"
+                className={styles.inputField}
+                placeholder="Enter Voter ID to search"
+                value={searchVoterId}
+                onChange={(e) => setSearchVoterId(e.target.value)}
+                onBlur={() => handleGetVoterDetails(searchVoterId)}
+              />
+
+              <button
+                className={`${styles.btn} ${styles.btnPrimary}`}
+                onClick={() => handleGetVoterDetails(searchVoterId)}  //  Uses input value
+                disabled={loading || !searchVoterId.trim()}
+              >
+                {loading ? 'Searching...' : '🔍 Search Voter'}
+              </button>
+
+
+            </div>
+
+            {voterDetails && (
+              <div className={styles.infoCard}>
+                {/* Same voterDetails display as before */}
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>Voter ID</span>
+                  <span className={styles.infoValue}>{voterDetails.id}</span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.infoLabel}>Name</span>
+                  <span className={styles.infoValue}>{voterDetails.name}</span>
+                </div>
+                {/* ... rest of voterDetails fields ... */}
+              </div>
+            )}
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-{/* Search Voter Section - API Lookup */}
-{currentSection === 'searchVoter' && (
-  <div>
-    <div className={styles.pageHeader}>
-      <div>
-        <h1 className={styles.pageTitle}>Search Voter</h1>
-        <p className={styles.pageSubtitle}>Find voter details by ID</p>
-      </div>
-    </div>
-
-    <div className={styles.inputForm}>
-      <h3 className={styles.formTitle}>
-        <span>🔍</span>
-        Search Voter Details
-      </h3>
-
-      <input
-        type="text"
-        className={styles.inputField}
-        placeholder="Enter Voter ID to search"
-        value={searchVoterId}
-        onChange={(e) => setSearchVoterId(e.target.value)}
-        onBlur={() => handleGetVoterDetails(searchVoterId)}
-      />
-
-      <button 
-        className={`${styles.btn} ${styles.btnPrimary}`}
-        onClick={() => handleGetVoterDetails(searchVoterId)}  //  Uses input value
-        disabled={loading || !searchVoterId.trim()}
-      >
-        {loading ? 'Searching...' : '🔍 Search Voter'}
-      </button>
-      
-      
-    </div>
-
-    {voterDetails && (
-      <div className={styles.infoCard}>
-        {/* Same voterDetails display as before */}
-        <div className={styles.infoRow}>
-          <span className={styles.infoLabel}>Voter ID</span>
-          <span className={styles.infoValue}>{voterDetails.id}</span>
-        </div>
-      <div className={styles.infoRow}>
-        <span className={styles.infoLabel}>Name</span>
-        <span className={styles.infoValue}>{voterDetails.name}</span>
-      </div>
-        {/* ... rest of voterDetails fields ... */}
-      </div>
-    )}
-  </div>
-)}
+        )}
 
         {/* Elections Section */}
-{currentSection === 'elections' && (
-  <div>
-    <div className={styles.pageHeader}>
-      <div>
-        <h1 className={styles.pageTitle}>Elections</h1>
-        <p className={styles.pageSubtitle}>View all active and past elections</p>
-      </div>
-      <button 
-        className={`${styles.btn} ${styles.btnPrimary}`}
-        onClick={loadElections}
-        disabled={loading}
-      >
-        {loading ? 'Loading...' : '🔄 Refresh List'}
-      </button>
-    </div>
-
-    {loading ? (
-      <div className={styles.loadingText}>Loading elections...</div>
-    ) : (
-      <div className={styles.electionsGrid}>
-        {elections.sort((a,b)=>a.id-b.id).map((election, idx) => (
-          <div key={idx} className={styles.electionCard}>
-            <div className={styles.electionHeader}>
-              <div className={styles.electionTitle}>{election.title}</div>
-              <span className={`${styles.badge} ${styles.badgePrimary}`}>
-                {election.status}
-              </span>
+        {currentSection === 'elections' && (
+          <div>
+            <div className={styles.pageHeader}>
+              <div>
+                <h1 className={styles.pageTitle}>Elections</h1>
+                <p className={styles.pageSubtitle}>View all active and past elections</p>
+              </div>
+              <button
+                className={`${styles.btn} ${styles.btnPrimary}`}
+                onClick={loadElections}
+                disabled={loading}
+              >
+                {loading ? 'Loading...' : '🔄 Refresh List'}
+              </button>
             </div>
 
-            <div className={styles.electionBody}>
-              <div className={styles.electionMeta}>
-                <span>ID : {election.id}</span>
-                <span>Contract : {election.contractAddress}</span>
-                <span>Type : {election.electionName}</span>
-              </div>
+            {loading ? (
+              <div className={styles.loadingText}>Loading elections...</div>
+            ) : (
+              <div className={styles.electionsGrid}>
+                {elections.sort((a, b) => a.id - b.id).map((election, idx) => (
+                  <div key={idx} className={styles.electionCard}>
+                    <div className={styles.electionHeader}>
+                      <div className={styles.electionTitle}>{election.title}</div>
+                      <span className={`${styles.badge} ${styles.badgePrimary}`}>
+                        {election.status}
+                      </span>
+                    </div>
 
-              <div className={styles.electionDates}>
-                <span>Starts : {formatTime(election.startDate)}</span>
-                <span>Ends : {formatTime(election.endDate)}</span>
+                    <div className={styles.electionBody}>
+                      <div className={styles.electionMeta}>
+                        <span>ID : {election.id}</span>
+                        <span>Contract : {election.contractAddress}</span>
+                        <span>Type : {election.electionName}</span>
+                      </div>
+
+                      <div className={styles.electionDates}>
+                        <span>Starts : {formatTime(election.startDate)}</span>
+                        <span>Ends : {formatTime(election.endDate)}</span>
+                      </div>
+
+                    </div>
+                  </div>
+                ))}
               </div>
-              
-            </div>
+            )}
+
+            {!loading && elections.length === 0 && (
+              <div className={styles.loadingText}>No elections found</div>
+            )}
           </div>
-        ))}
-      </div>
-    )}
-
-    {!loading && elections.length === 0 && (
-      <div className={styles.loadingText}>No elections found</div>
-    )}
-  </div>
-)}
+        )}
 
 
         {/* Candidates Section */}
@@ -744,7 +746,7 @@ if(hh>11)isAm=false;
                 <h1 className={styles.pageTitle}>Candidates</h1>
                 <p className={styles.pageSubtitle}>View all registered candidates</p>
               </div>
-              <button 
+              <button
                 className={`${styles.btn} ${styles.btnPrimary}`}
                 onClick={loadCandidates}
                 disabled={loading}
@@ -757,7 +759,7 @@ if(hh>11)isAm=false;
               <div className={styles.loadingText}>Loading candidates...</div>
             ) : (
               <div className={styles.candidatesGrid}>
-                {candidates.sort((a,b)=>a.id-b.id).map((candidate, idx) => (
+                {candidates.sort((a, b) => a.id - b.id).map((candidate, idx) => (
                   <div key={idx} className={styles.candidateCard}>
                     <div className={styles.candidateHeader}>
                       <div className={styles.candidateAvatar}>
@@ -825,7 +827,7 @@ if(hh>11)isAm=false;
                   onChange={(e) => setVoteForm({ ...voteForm, id: e.target.value })}
                   required
                 />
- 
+
                 {/* <label className={styles.label}>Select Candidate *</label> */}
                 <select
                   className={styles.inputField}
@@ -835,8 +837,8 @@ if(hh>11)isAm=false;
                 >
                   <option value="">Choose a candidate...</option>
                   {candidates.map((c) => (
-                    <option key={c.candidateId} value={c.candidateId}>
-                     {c.id} - {c.name} - {c.constituency} - {c.partyName}
+                    <option key={c.id} value={c.id}>
+                      {c.id} - {c.name} - {c.constituency} - {c.partyName}
                     </option>
                   ))}
                 </select>
@@ -858,8 +860,8 @@ if(hh>11)isAm=false;
                   <button type="submit" className={`${styles.btn} ${styles.btnSuccess}`} disabled={loading}>
                     {loading ? 'Submitting...' : '✓ Submit Vote'}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className={`${styles.btn} ${styles.btnSecondary}`}
                     onClick={() => setVoteForm({ id: '', candidateId: '', confirmCandidateId: '' })}
                   >
@@ -898,7 +900,7 @@ if(hh>11)isAm=false;
                 onChange={(e) => setResultsId(e.target.value)}
               />
 
-              <button 
+              <button
                 className={`${styles.btn} ${styles.btnPrimary}`}
                 onClick={handleGetResults}
                 disabled={loading}
@@ -907,99 +909,99 @@ if(hh>11)isAm=false;
               </button>
             </div>
 
-         <div className={styles.voteResults}>
-            {results.length > 0 ? (
-              (() => {
-                const parsed = results.map((r) => ({
-                  candidateId: r.id,
-                  name: r.name,
-                  partyName: r.partyName,
-                  votes: r.votes
-                }));
+            <div className={styles.voteResults}>
+              {results.length > 0 ? (
+                (() => {
+                  const parsed = results.map((r) => ({
+                    candidateId: r.id,
+                    name: r.name,
+                    partyName: r.partyName,
+                    votes: r.votes
+                  }));
 
-                const totalVotes = parsed.reduce((sum, r) => sum + r.votes, 0);
-                const sorted = [...parsed].sort((a, b) => b.votes - a.votes);
+                  const totalVotes = parsed.reduce((sum, r) => sum + r.votes, 0);
+                  const sorted = [...parsed].sort((a, b) => b.votes - a.votes);
 
-                return (
-                  <>
-                    <div className={styles.tableContainer}>
-                      <table className={styles.electionTable}>
-                        <thead>
-                          <tr>
-                            <th className={styles.tableHeader}>Rank</th>
-                            <th className={styles.tableHeader}>Candidate</th>
-                            <th className={styles.tableHeader}>Party</th>
-                            <th className={styles.tableHeader}>Votes</th>
-                            <th className={styles.tableHeader}>%</th>
-                            <th className={styles.tableHeader}>Progress</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sorted.map((row, index) => {
-                            const percentage = totalVotes > 0
-                              ? ((row.votes / totalVotes) * 100).toFixed(1)
-                              : 0;
+                  return (
+                    <>
+                      <div className={styles.tableContainer}>
+                        <table className={styles.electionTable}>
+                          <thead>
+                            <tr>
+                              <th className={styles.tableHeader}>Rank</th>
+                              <th className={styles.tableHeader}>Candidate</th>
+                              <th className={styles.tableHeader}>Party</th>
+                              <th className={styles.tableHeader}>Votes</th>
+                              <th className={styles.tableHeader}>%</th>
+                              <th className={styles.tableHeader}>Progress</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sorted.map((row, index) => {
+                              const percentage = totalVotes > 0
+                                ? ((row.votes / totalVotes) * 100).toFixed(1)
+                                : 0;
 
-                            return (
-                              <tr key={row.candidateId} className={styles.tableRow}>
-                                <td className={styles.tableCell}>
-                                  <strong>#{index + 1}</strong>
-                                </td>
-                                <td className={styles.tableCell}>
-                                  <div className={styles.candidateName}>
-                                    <strong>{row.name}</strong>
-                                    <span className={styles.candidateId}>#{row.candidateId}</span>
-                                  </div>
-                                </td>
-                                <td className={styles.tableCell}>
-                                  <span className={styles.partyBadge}>{row.partyName}</span>
-                                </td>
-                                <td className={`${styles.tableCell} ${styles.votesCell}`}>
-                                  {row.votes.toLocaleString()}
-                                </td>
-                                <td className={styles.tableCell}>
-                                  <span className={`${styles.badge} ${styles.badgeInfo}`}>
-                                    {percentage}%
-                                  </span>
-                                </td>
-                                <td className={styles.tableCell}>
-                                  <div className={styles.progressBar}>
-                                    <div
-                                      className={styles.progressFill}
-                                      style={{ width: `${percentage}%` }}
-                                    />
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className={styles.infoCard}>
-                      <div className={styles.infoRow}>
-                        <span className={styles.infoLabel}>Total Votes Cast</span>
-                        <span className={`${styles.infoValue} ${styles.infoValueLarge}`}>
-                          {totalVotes.toLocaleString()}
-                        </span>
+                              return (
+                                <tr key={row.candidateId} className={styles.tableRow}>
+                                  <td className={styles.tableCell}>
+                                    <strong>#{index + 1}</strong>
+                                  </td>
+                                  <td className={styles.tableCell}>
+                                    <div className={styles.candidateName}>
+                                      <strong>{row.name}</strong>
+                                      <span className={styles.candidateId}>#{row.candidateId}</span>
+                                    </div>
+                                  </td>
+                                  <td className={styles.tableCell}>
+                                    <span className={styles.partyBadge}>{row.partyName}</span>
+                                  </td>
+                                  <td className={`${styles.tableCell} ${styles.votesCell}`}>
+                                    {row.votes.toLocaleString()}
+                                  </td>
+                                  <td className={styles.tableCell}>
+                                    <span className={`${styles.badge} ${styles.badgeInfo}`}>
+                                      {percentage}%
+                                    </span>
+                                  </td>
+                                  <td className={styles.tableCell}>
+                                    <div className={styles.progressBar}>
+                                      <div
+                                        className={styles.progressFill}
+                                        style={{ width: `${percentage}%` }}
+                                      />
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
-                      <div className={styles.infoRow}>
-                        <span className={styles.infoLabel}>Leading Candidate</span>
-                        <span className={styles.infoValue}>{sorted[0]?.name || 'N/A'}</span>
+
+                      <div className={styles.infoCard}>
+                        <div className={styles.infoRow}>
+                          <span className={styles.infoLabel}>Total Votes Cast</span>
+                          <span className={`${styles.infoValue} ${styles.infoValueLarge}`}>
+                            {totalVotes.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className={styles.infoRow}>
+                          <span className={styles.infoLabel}>Leading Candidate</span>
+                          <span className={styles.infoValue}>{sorted[0]?.name || 'N/A'}</span>
+                        </div>
+                        <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
+                          <span className={styles.infoLabel}>Leading Party</span>
+                          <span className={styles.infoValue}>{sorted[0]?.partyName || 'N/A'}</span>
+                        </div>
                       </div>
-                      <div className={`${styles.infoRow} ${styles.infoRowLast}`}>
-                        <span className={styles.infoLabel}>Leading Party</span>
-                        <span className={styles.infoValue}>{sorted[0]?.partyName || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </>
-                );
-              })()
-            ) : (
-              <div className={styles.noResults}></div>
-            )}
-          </div>
+                    </>
+                  );
+                })()
+              ) : (
+                <div className={styles.noResults}></div>
+              )}
+            </div>
 
 
           </div>
@@ -1040,7 +1042,7 @@ if(hh>11)isAm=false;
                       placeholder="Full name"
                       value={updateForm.name}
                       onChange={(e) => setUpdateForm({ ...updateForm, name: e.target.value })}
-                      
+
                     />
                   </div>
                   <div>
@@ -1092,8 +1094,8 @@ if(hh>11)isAm=false;
                   <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading}>
                     {loading ? 'Saving...' : '💾 Save Changes'}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className={`${styles.btn} ${styles.btnSecondary}`}
                     onClick={() => setUpdateForm({ name: '', email: '', phone: '', age: '', address: '' })}
                   >

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { authService } from '../AuthService';
 import styles from './Signup.module.css';
-import {useNavigate,Link} from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Signup = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -15,12 +15,12 @@ const Signup = () => {
     confirmPassword: '',
     role: ''
   });
-  
+
   const [showPassword, setShowPassword] = useState({
     password: false,
     confirmPassword: false
   });
-  
+
   const [validation, setValidation] = useState({});
   const [message, setMessage] = useState({ text: '', type: '' });
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +31,7 @@ const Signup = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if(value!=='voter'){
+    if (value !== 'voter') {
       setFormData({
         ...formData,
         [name]: value
@@ -144,7 +144,7 @@ const Signup = () => {
       setMessage({ text: 'Please fill all fields correctly before generating OTP', type: 'error' });
       return;
     }
-  setIsLoading(true);
+    setIsLoading(true);
 
     try {
       const credentials = {
@@ -157,16 +157,16 @@ const Signup = () => {
       };
 
       await authService.signUp(credentials);
-      
+
       setShowOtp(true);
       setOtpGenerated(true);
       setMessage({ text: 'successfully otp generated', type: 'success' });
 
     } catch (error) {
-      console.log('Full error:', error.response); 
-      setMessage({ 
-        text: error.response.data || error.message || 'Signup failed', 
-        type: 'error' 
+      console.log('Full error:', error.response);
+      setMessage({
+        text: error.response.data || error.message || 'Signup failed',
+        type: 'error'
       });
     } finally {
       setIsLoading(false);
@@ -191,12 +191,12 @@ const Signup = () => {
     }
   };
 
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   const otpValue = otp.join('');
-    
+    const otpValue = otp.join('');
+
     if (otpValue.length !== 6) {
       setMessage({ text: 'Please enter the complete 6-digit OTP', type: 'error' });
       return;
@@ -209,23 +209,23 @@ const Signup = () => {
         email: formData.email,
         otp: otpValue
       };
-      
+
       await authService.verifyAccount(credentials);
-      
+
       setMessage({ text: 'Account verified successfully! Redirecting...', type: 'success' });
 
       setTimeout(() => {
         navigate('/login');
       }, 10);
     } catch (error) {
-      setMessage({ 
-        text: error.response.data || 'Verification failed', 
-        type: 'error' 
+      setMessage({
+        text: error.response.data || 'Verification failed',
+        type: 'error'
       });
     } finally {
       setIsLoading(false);
     }
-    
+
   };
 
   const hideMessage = () => {
@@ -240,9 +240,9 @@ const Signup = () => {
         <div className={styles.loginHeader}>
           <div className={styles.logoContainer}>ECI</div>
           <h1>Create Account</h1>
-          <p>Sign up to access your voting portal</p>
-           <p>Your data is securely stored and </p>
-           <p>won't be compromised at any time</p>
+          <p>Sign up to access your voting portal.</p>
+          <p>Your data is securely stored and it</p>
+          <p>won't be compromised at any time.</p>
 
         </div>
 
@@ -253,7 +253,7 @@ const Signup = () => {
         )}
 
         <form className={styles.loginForm} onSubmit={handleSubmit}>
-          
+
           {/* Name Input */}
           <div className={styles.inputGroup}>
             <div className={`${styles.inputWrapper} ${validation.name ? (validation.name.valid ? styles.valid : styles.invalid) : ''}`}>
@@ -495,12 +495,12 @@ const Signup = () => {
               ))}
             </div>
           )}
-            {otpGenerated && (
-              <div style={{textAlign:'center'}}>
-                <span  style={{ opacity: isLoading ? 0 : 1 }}>check spam mails too!</span>
-                </div>
-              
-            )}
+          {otpGenerated && (
+            <div style={{ textAlign: 'center' }}>
+              <span style={{ opacity: isLoading ? 0 : 1 }}>check spam mails too!</span>
+            </div>
+
+          )}
           {/* Buttons */}
           <div className={styles.btnGroup}>
             <button
