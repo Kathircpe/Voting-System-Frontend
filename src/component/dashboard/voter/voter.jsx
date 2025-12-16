@@ -183,7 +183,11 @@ const Voter = () => {
     }
   }, [currentSection]);
 
-
+  useEffect(() => {
+      if (currentSection === 'vote') {
+        loadCandidates();
+      }
+    }, [currentSection]);
   // Handlers
   const handleGetVoterDetails = async (voterId) => {
     if (!voterId.trim()) {
