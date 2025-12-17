@@ -337,10 +337,23 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Election ID" });
       return;
     }
+    if (
+      !electionForm.electionName &&
+      !electionForm.startDate &&
+      !electionForm.endDate
+    ) {
+      setMessage({ type: "error", text: "Please enter atleast one detail" });
+      return;
+    }
+    let data = { id: electionForm.id };
+    if (electionForm.electionName.trim())
+      data.electionName = electionForm.electionName.trim();
+    if (electionForm.startDate) data.startDate = electionForm.startDate;
+    if (electionForm.endDate) data.endDate = electionForm.endDate;
 
     try {
       setLoading(true);
-      await apiCalls.updateElection(electionForm);
+      await apiCalls.updateElection(data);
       setMessage({
         type: "success",
         text: `Election ${electionForm.id} updated successfully!`,
@@ -1506,7 +1519,7 @@ const Admin = () => {
                             {(
                               ((vote.votes || 0) /
                                 votesData.reduce(
-                                  (sum, v) => sum + (v.voteCount || 0),
+                                  (sum, v) => sum + (v.votes || 0),
                                   0
                                 )) *
                               100
