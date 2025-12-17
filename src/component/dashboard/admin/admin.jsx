@@ -315,6 +315,10 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please fill all required fields" });
       return;
     }
+    if (typeof electionForm.electionName.trim() !== "string") {
+      setMessage({ type: "error", text: "Please enter a valid election name" });
+      return;
+    }
 
     try {
       setLoading(true);
@@ -340,6 +344,10 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Election ID" });
       return;
     }
+    if (typeof electionForm.id.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
+      return;
+    }
     if (
       !electionForm.electionName &&
       !electionForm.startDate &&
@@ -349,6 +357,14 @@ const Admin = () => {
       return;
     }
     let data = { id: electionForm.id };
+    if (
+      electionForm.electionName.trim() &&
+      typeof electionForm.id.trim() !== "string"
+    ) {
+      setMessage({ type: "error", text: "Please enter a valid name" });
+      return;
+    }
+
     if (electionForm.electionName.trim())
       data.electionName = electionForm.electionName.trim();
     if (electionForm.startDate) data.startDate = electionForm.startDate;
@@ -379,6 +395,10 @@ const Admin = () => {
   const handleDeleteElection = async () => {
     if (!deleteElectionId) {
       setMessage({ type: "error", text: "Please enter Election ID" });
+      return;
+    }
+    if (typeof deleteElectionId.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
       return;
     }
     if (!window.confirm(`Delete election ${deleteElectionId}?`)) return;
@@ -417,6 +437,10 @@ const Admin = () => {
       });
       return;
     }
+    if (typeof candidateForm.name.trim() !== "string") {
+      setMessage({ type: "error", text: "Please enter a valid name" });
+      return;
+    }
 
     try {
       setLoading(true);
@@ -442,6 +466,10 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Candidate ID" });
       return;
     }
+    if (typeof candidateForm.id.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
+      return;
+    }
     if (
       !candidateForm.name &&
       !candidateForm.partyName &&
@@ -452,6 +480,13 @@ const Admin = () => {
     }
 
     let data = { id: candidateForm.id };
+    if (
+      candidateForm.name.trim() &&
+      typeof candidateForm.name.trim() !== "string"
+    ) {
+      setMessage({ type: "error", text: "Please enter a valid name" });
+      return;
+    }
     if (candidateForm.name) data.name = candidateForm.name;
     if (candidateForm.partyName) data.partyName = candidateForm.partyName;
     if (candidateForm.constituency)
@@ -482,6 +517,10 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Candidate ID" });
       return;
     }
+    if (typeof deleteCandidateId.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
+      return;
+    }
     if (!window.confirm(`Delete candidate ${deleteCandidateId}?`)) return;
 
     try {
@@ -506,6 +545,10 @@ const Admin = () => {
 
   // Voter handlers
   const handleGetAllVoters = async () => {
+    if (typeof currentPage.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
+      return;
+    }
     try {
       setLoading(true);
       const data = await apiCalls.getAllVoters(currentPage);
@@ -521,6 +564,10 @@ const Admin = () => {
   const handleGetSingleVoter = async () => {
     if (!voterId.trim()) {
       setMessage({ type: "error", text: "Please enter Voter ID" });
+      return;
+    }
+    if (typeof voterId.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
       return;
     }
     try {
@@ -547,6 +594,10 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter election Id" });
       return;
     }
+    if (typeof electionId.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
+      return;
+    }
     try {
       setLoading(true);
       const data = await apiCalls.getAllVotes(electionId.trim());
@@ -567,14 +618,21 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please fill all fields" });
       return;
     }
-
+    if (
+      typeof secondElectionId.trim() !== "number" ||
+      typeof candidateIdForVotes.trim() !== "number"
+    ) {
+      setMessage({ type: "error", text: "Please enter a number" });
+      return;
+    }
     try {
       setLoading(true);
       const data = await apiCalls.getSingleCandidateVotes(
-        secondElectionId,
-        candidateIdForVotes
+        secondElectionId.trim(),
+        candidateIdForVotes.trim()
       );
       setVotesData([data]);
+      if (!votersData[0].name) setVotesData([]);
     } catch (error) {
       setMessage({
         type: "error",

@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { authService } from '../AuthService';
-import styles from './Login.module.css';
-import {useNavigate,Link} from 'react-router-dom';
+import React, { useState } from "react";
+import { authService } from "../AuthService";
+import styles from "./Login.module.css";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    role: ''
+    email: "",
+    password: "",
+    role: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -30,13 +30,13 @@ const Login = () => {
     e.preventDefault();
 
     if (!formData.email || !formData.password || !formData.role) {
-      setMessage({ text: 'Please fill in all fields', type: 'error' });
+      setMessage({ text: "Please fill in all fields", type: "error" });
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setMessage({ text: 'Please enter a valid email address', type: 'error' });
+      setMessage({ text: "Please enter a valid email address", type: "error" });
       return;
     }
 
@@ -46,27 +46,27 @@ const Login = () => {
       const credentials = {
         email: formData.email,
         password: formData.password,
-        role: formData.role
+        role: formData.role,
       };
 
       const response = await authService.login(credentials);
-      
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      setMessage({ text: 'Login successful! Redirecting...', type: 'success' });
-      
+
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
+
+      setMessage({ text: "Login successful! Redirecting...", type: "success" });
+
       setTimeout(() => {
-        if (formData.role === 'admin') {
-          navigate('/admin');
+        if (formData.role === "admin") {
+          navigate("/admin");
         } else {
-          navigate('/voter');
+          navigate("/voter");
         }
-      }, 10);
+      }, 500);
     } catch (error) {
-      setMessage({ 
-        text: error.response?.data || error.message || 'Login failed', 
-        type: 'error' 
+      setMessage({
+        text: error.response?.data || error.message || "Login failed",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -74,8 +74,8 @@ const Login = () => {
   };
 
   const hideMessage = () => {
-    if (message.type === 'error') {
-      setMessage({ text: '', type: '' });
+    if (message.type === "error") {
+      setMessage({ text: "", type: "" });
     }
   };
 
@@ -89,7 +89,11 @@ const Login = () => {
         </div>
 
         {message.text && (
-          <div className={`${styles.message} ${styles[message.type]} ${styles.show}`}>
+          <div
+            className={`${styles.message} ${styles[message.type]} ${
+              styles.show
+            }`}
+          >
             {message.text}
           </div>
         )}
@@ -117,7 +121,7 @@ const Login = () => {
             <div className={styles.inputWrapper}>
               <span className={styles.inputIcon}>🔒</span>
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 placeholder=" "
@@ -133,7 +137,7 @@ const Login = () => {
                 className={styles.passwordToggle}
                 onClick={togglePassword}
               >
-                <span>{showPassword ? '🙈' : '👁️'}</span>
+                <span>{showPassword ? "🙈" : "👁️"}</span>
               </button>
             </div>
           </div>
@@ -159,7 +163,9 @@ const Login = () => {
           <div className={styles.btnGroup}>
             <button
               type="submit"
-              className={`${styles.btn} ${styles.btnPrimary} ${isLoading ? styles.loading : ''}`}
+              className={`${styles.btn} ${styles.btnPrimary} ${
+                isLoading ? styles.loading : ""
+              }`}
               disabled={isLoading}
             >
               <span style={{ opacity: isLoading ? 0 : 1 }}>Log In</span>
@@ -168,7 +174,7 @@ const Login = () => {
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSecondary}`}
-              onClick={() => navigate('/signup')}
+              onClick={() => navigate("/signup")}
             >
               <span>Sign Up</span>
             </button>
@@ -176,7 +182,7 @@ const Login = () => {
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSecondary}`}
-              onClick={() => navigate('/auth/verify-account')}
+              onClick={() => navigate("/auth/verify-account")}
             >
               <span>✓ Verify Account</span>
             </button>
@@ -197,7 +203,9 @@ const Login = () => {
         </div>
 
         <div className={styles.loginFooter}>
-          <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
+          <p>
+            By continuing, you agree to our Terms of Service and Privacy Policy
+          </p>
           <Link to="/help">Need Help?</Link>
         </div>
       </div>

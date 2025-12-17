@@ -181,6 +181,10 @@ const Voter = () => {
       setMessage({ type: "error", text: "Please enter your Voter ID" });
       return;
     }
+    if (voterId.trim() && typeof voterId.trim() !== "number") {
+      setMessage({ type: "error", text: "Enter a number" });
+      return;
+    }
 
     try {
       setLoading(true);
@@ -248,14 +252,25 @@ const Voter = () => {
     ) {
       return;
     }
+    const data = {
+      id: voteForm.id,
+      candidateId: voteForm.candidateId,
+      voterId: user.id,
+    };
+    if (
+      typeof data.id.trim() !== "number" ||
+      typeof data.candidateId.trim() !== "number"
+    ) {
+      setMessage({
+        type: "error",
+        text: "please type a number",
+      });
+      return;
+    }
 
     try {
       setLoading(true);
-      await apiCalls.castVote({
-        id: voteForm.id,
-        candidateId: voteForm.candidateId,
-        voterId: user.id,
-      });
+      await apiCalls.castVote(data);
       setVoteMessage({
         type: "success",
         text: "Your vote has been successfully recorded! Thank you for participating.",
@@ -279,6 +294,10 @@ const Voter = () => {
   const handleGetResults = async () => {
     if (!resultsId.trim()) {
       setMessage({ type: "error", text: "Please enter election id" });
+      return;
+    }
+    if (typeof resultsId.trim() !== "number") {
+      setMessage({ type: "error", text: "Please enter a number" });
       return;
     }
 
@@ -305,6 +324,10 @@ const Voter = () => {
     if (updateForm.name.trim()) updateData.name = updateForm.name.trim();
     if (updateForm.email.trim()) updateData.email = updateForm.email.trim();
     if (updateForm.phone.trim()) updateData.phone = updateForm.phone.trim();
+    if (updateForm.age && typeof updateData.age.trim() === "number") {
+      setMessage({ type: "error", text: "Enter a number" });
+      return;
+    }
     if (updateForm.age) updateData.age = parseInt(updateForm.age);
     if (updateForm.address.trim())
       updateData.address = updateForm.address.trim();
@@ -323,6 +346,7 @@ const Voter = () => {
     }
     if (
       updateData.phone &&
+      typeof updateData.phone === "number" &&
       (updateData.phone.length !== 10 || !/^\d+$/.test(updateData.phone))
     ) {
       setMessage({ type: "error", text: "Valid 10-digit phone required" });
