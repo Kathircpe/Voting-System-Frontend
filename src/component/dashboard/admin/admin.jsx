@@ -571,7 +571,7 @@ const Admin = () => {
         secondElectionId,
         candidateIdForVotes
       );
-      setVotesData(Array.isArray(data) ? data : [data]);
+      setVotesData([data]);
     } catch (error) {
       setMessage({
         type: "error",
@@ -1522,7 +1522,7 @@ const Admin = () => {
                                   (sum, v) => sum + (v.votes || 0),
                                   0
                                 )) *
-                              100
+                                100 || 0
                             ).toFixed(1)}
                             %
                           </td>
