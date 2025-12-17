@@ -94,7 +94,7 @@ const Admin = () => {
         },
         body: JSON.stringify(data),
       });
-      return await response.json();
+      return await response;
     },
 
     deleteElection: async (electionId) => {
@@ -265,7 +265,10 @@ const Admin = () => {
       setElections(Array.isArray(electionsData) ? electionsData : []);
       setCandidates(Array.isArray(candidatesData) ? candidatesData : []);
     } catch (error) {
-      console.error("Error loading overview:", error.reponse.data);
+      console.error(
+        "Error loading overview:",
+        error.reponse?.data || error.message
+      );
     }
   };
 
@@ -275,7 +278,6 @@ const Admin = () => {
       const data = await apiCalls.getAllElections();
       setElections(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Error fetching elections:", error);
       setMessage({ type: "error", text: "Failed to load elections" });
     } finally {
       setLoading(false);
@@ -350,7 +352,8 @@ const Admin = () => {
     } catch (error) {
       setMessage({
         type: "error",
-        text: error.response.data || "Failed to update election",
+        text:
+          error.response?.data || error.message || "Failed to update election",
       });
     } finally {
       setLoading(false);
