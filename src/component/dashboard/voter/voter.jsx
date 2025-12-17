@@ -182,7 +182,7 @@ const Voter = () => {
       return;
     }
     if (voterId.trim() && isNaN(voterId.trim())) {
-      setMessage({ type: "error", text: "Enter a number" });
+      setMessage({ type: "error", text: "Enter a valid number" });
       return;
     }
 
@@ -236,7 +236,13 @@ const Voter = () => {
       setMessage({ type: "error", text: "Please fill in all fields" });
       return;
     }
-
+    if (isNaN(voteForm.id.trim()) || isNaN(voteForm.candidateId.trim())) {
+      setMessage({
+        type: "error",
+        text: "please enter a valid number",
+      });
+      return;
+    }
     if (voteForm.confirmCandidateId !== voteForm.candidateId) {
       setMessage({
         type: "error",
@@ -257,16 +263,6 @@ const Voter = () => {
       candidateId: voteForm.candidateId,
       voterId: user.id,
     };
-    if (
-      typeof data.id.trim() !== "number" ||
-      typeof data.candidateId.trim() !== "number"
-    ) {
-      setMessage({
-        type: "error",
-        text: "please type a number",
-      });
-      return;
-    }
 
     try {
       setLoading(true);
@@ -296,11 +292,10 @@ const Voter = () => {
       setMessage({ type: "error", text: "Please enter election id" });
       return;
     }
-    if (typeof resultsId.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
+    if (isNaN(resultsId.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
       return;
     }
-
     try {
       setLoading(true);
       const data = await apiCalls.getVoteResults(resultsId);
@@ -324,8 +319,8 @@ const Voter = () => {
     if (updateForm.name.trim()) updateData.name = updateForm.name.trim();
     if (updateForm.email.trim()) updateData.email = updateForm.email.trim();
     if (updateForm.phone.trim()) updateData.phone = updateForm.phone.trim();
-    if (updateForm.age && typeof updateData.age.trim() === "number") {
-      setMessage({ type: "error", text: "Enter a number" });
+    if (updateForm.age && isNaN(updateForm.age.trim())) {
+      setMessage({ type: "error", text: "Enter a valid number for age" });
       return;
     }
     if (updateForm.age) updateData.age = parseInt(updateForm.age);

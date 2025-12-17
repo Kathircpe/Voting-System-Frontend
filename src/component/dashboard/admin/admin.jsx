@@ -344,8 +344,8 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Election ID" });
       return;
     }
-    if (typeof electionForm.id.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
+    if (isNaN(electionForm.id.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
       return;
     }
     if (
@@ -397,8 +397,8 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Election ID" });
       return;
     }
-    if (typeof deleteElectionId.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
+    if (isNaN(deleteElectionId.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
       return;
     }
     if (!window.confirm(`Delete election ${deleteElectionId}?`)) return;
@@ -466,8 +466,8 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Candidate ID" });
       return;
     }
-    if (typeof candidateForm.id.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
+    if (isNaN(candidateForm.id.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
       return;
     }
     if (
@@ -517,8 +517,8 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Candidate ID" });
       return;
     }
-    if (typeof deleteCandidateId.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
+    if (isNaN(deleteCandidateId.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
       return;
     }
     if (!window.confirm(`Delete candidate ${deleteCandidateId}?`)) return;
@@ -545,10 +545,6 @@ const Admin = () => {
 
   // Voter handlers
   const handleGetAllVoters = async () => {
-    if (typeof currentPage.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
-      return;
-    }
     try {
       setLoading(true);
       const data = await apiCalls.getAllVoters(currentPage);
@@ -566,8 +562,8 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter Voter ID" });
       return;
     }
-    if (typeof voterId.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
+    if (isNaN(voterId.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
       return;
     }
     try {
@@ -594,8 +590,8 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please enter election Id" });
       return;
     }
-    if (typeof electionId.trim() !== "number") {
-      setMessage({ type: "error", text: "Please enter a number" });
+    if (isNaN(electionId.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
       return;
     }
     try {
@@ -618,10 +614,7 @@ const Admin = () => {
       setMessage({ type: "error", text: "Please fill all fields" });
       return;
     }
-    if (
-      typeof secondElectionId.trim() !== "number" ||
-      typeof candidateIdForVotes.trim() !== "number"
-    ) {
+    if (isNaN(secondElectionId.trim()) || isNaN(candidateIdForVotes.trim())) {
       setMessage({ type: "error", text: "Please enter a number" });
       return;
     }
@@ -803,11 +796,11 @@ const Admin = () => {
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statLabel}>Active Voters</div>
-                <div className={styles.statValue}>1,65,321</div>
+                <div className={styles.statValue}>16,504</div>
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statLabel}>Total Votes</div>
-                <div className={styles.statValue}>2,13,967</div>
+                <div className={styles.statValue}>32,139</div>
               </div>
             </div>
           </div>
