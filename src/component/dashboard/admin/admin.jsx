@@ -624,8 +624,7 @@ const Admin = () => {
         secondElectionId.trim(),
         candidateIdForVotes.trim()
       );
-      setVotesData([data]);
-      if (!votersData[0].name) setVotesData([]);
+      setVotesData(Array.isArray(data) ? data : []);
     } catch (error) {
       setMessage({
         type: "error",
