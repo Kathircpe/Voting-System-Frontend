@@ -238,10 +238,13 @@ const Admin = () => {
           },
         }
       );
-      if (typeof response === "string") {
-        return await response;
+      const raw = await response.text();
+      try {
+        const parsed = raw ? JSON.parse(raw) : null;
+        return parsed;
+      } catch {
+        return raw;
       }
-      return await response.json();
     },
   };
 
@@ -624,7 +627,21 @@ const Admin = () => {
         secondElectionId.trim(),
         candidateIdForVotes.trim()
       );
-      setVotesData(Array.isArray(data) ? data : []);
+      if (Array.isArray(data)) {
+        setVotesData(data);
+      } else if (typeof data === "string") {
+        setVotesData([]);
+        setMessage({
+          type: "error",
+          text: data || "Failed to fetch candidate votes",
+        });
+      } else {
+        setVotesData([]);
+        setMessage({
+          type: "error",
+          text: "unexpected error",
+        });
+      }
     } catch (error) {
       setMessage({
         type: "error",
