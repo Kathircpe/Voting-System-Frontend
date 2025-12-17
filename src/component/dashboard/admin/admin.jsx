@@ -238,7 +238,10 @@ const Admin = () => {
           },
         }
       );
-      return await response;
+      if (typeof response === "string") {
+        return await response;
+      }
+      return await response.json();
     },
   };
 
