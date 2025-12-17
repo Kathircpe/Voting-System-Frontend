@@ -181,7 +181,7 @@ const Voter = () => {
       setMessage({ type: "error", text: "Please enter your Voter ID" });
       return;
     }
-    if (voterId.trim() && typeof voterId.trim() !== "number") {
+    if (voterId.trim() && isNaN(voterId.trim())) {
       setMessage({ type: "error", text: "Enter a number" });
       return;
     }
