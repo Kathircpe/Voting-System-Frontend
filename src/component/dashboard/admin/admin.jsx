@@ -108,7 +108,7 @@ const Admin = () => {
           },
         }
       );
-      return await response.json();
+      return await response;
     },
 
     getAllElections: async () => {
@@ -1427,9 +1427,7 @@ const Admin = () => {
                     className={styles.inputField}
                     value={currentPage}
                     placeholder="Page Number"
-                    onChange={(e) =>
-                      setCurrentPage(e.target.value)
-                    }
+                    onChange={(e) => setCurrentPage(e.target.value)}
                   />
                 </div>
               </div>
