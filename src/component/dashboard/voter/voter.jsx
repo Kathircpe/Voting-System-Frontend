@@ -409,8 +409,7 @@ const Voter = () => {
     } catch (error) {
       setUpdateMessage({
         type: "error",
-        text:
-          error?.response?.data || "Failed to load profile. Please try again.",
+        text: error.message || "Failed to load profile. Please try again.",
       });
     }
   };
