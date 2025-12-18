@@ -399,7 +399,7 @@ const Voter = () => {
     try {
       setLoading(true);
       const response = await apiCalls.getProfile();
-      localStorage.setItem("user", response.user);
+      localStorage.setItem("user", JSON.stringify(response.user));
       setUser(response.user);
       setTimeout(() => setUpdateMessage(null), 5000);
       setMessage(null);
