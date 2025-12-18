@@ -380,7 +380,6 @@ const Voter = () => {
         type: "success",
         text: "Profile updated successfully! Changes will be reflected shortly.",
       });
-      handleGetProfile();
       setTimeout(() => setUpdateMessage(null), 5000);
       setMessage(null);
     } catch (error) {
@@ -407,6 +406,8 @@ const Voter = () => {
         type: "error",
         text: error.message || "Failed to load profile. Please try again.",
       });
+    } finally {
+      setLoading(false);
     }
   };
   const formatTime = (value) => {
