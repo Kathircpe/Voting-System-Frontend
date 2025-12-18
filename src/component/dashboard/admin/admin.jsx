@@ -1428,7 +1428,7 @@ const Admin = () => {
                     value={currentPage}
                     placeholder="Page Number"
                     onChange={(e) =>
-                      setCurrentPage(parseInt(e.target.value) || 1)
+                      setCurrentPage(e.target.value)
                     }
                   />
                 </div>
