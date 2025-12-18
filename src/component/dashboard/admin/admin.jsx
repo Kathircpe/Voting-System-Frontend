@@ -28,7 +28,7 @@ const Admin = () => {
   const [candidates, setCandidates] = useState([]);
   const [votersData, setVotersData] = useState([]);
   const [votesData, setVotesData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState("");
   const [votersPageSize, setVotersPageSize] = useState(10);
 
   // Form states
@@ -1426,6 +1426,7 @@ const Admin = () => {
                     type="text"
                     className={styles.inputField}
                     value={currentPage}
+                    placeholder="Page Number"
                     onChange={(e) =>
                       setCurrentPage(parseInt(e.target.value) || 1)
                     }

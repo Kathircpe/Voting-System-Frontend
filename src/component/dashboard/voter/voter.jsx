@@ -245,7 +245,13 @@ const Voter = () => {
 
   const handleCastVote = async (e) => {
     e.preventDefault();
-
+    if (user.hasVoted) {
+      setMessage({
+        type: "error",
+        text: "You have already voted in the election!",
+      });
+      return;
+    }
     if (!voteForm.id || !voteForm.candidateId || !voteForm.confirmCandidateId) {
       setMessage({ type: "error", text: "Please fill in all fields" });
       return;
