@@ -173,15 +173,14 @@ const Voter = () => {
       loadElections();
       return;
     }
+  }, [currentSection]);
+
+  useEffect(() => {
     if (currentSection === "myProfile") {
-      getProfile();
+      handleGetProfile();
     }
   }, [currentSection]);
-  // useEffect(() => {
-  //   if (currentSection === "myProfile") {
-  //     handleGetProfile();
-  //   }
-  // }, [currentSection]);
+
   // Load candidates on mount
   useEffect(() => {
     if (currentSection === "candidates" || currentSection === "vote") {
