@@ -157,16 +157,13 @@ const Voter = () => {
     },
     getProfile: async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_BASE_URL}/getProfile/${user.id.trim()}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/getProfile/${user.id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       return await response.json();
     },
   };
@@ -174,21 +171,24 @@ const Voter = () => {
   useEffect(() => {
     if (currentSection === "elections" || currentSection === "overview") {
       loadElections();
+      return;
+    }
+    if (currentSection === "myProfile") {
+      getProfile();
     }
   }, [currentSection]);
-
+  useEffect(() => {
+    if (currentSection === "myProfile") {
+      getProfile();
+    }
+  }, [currentSection]);
   // Load candidates on mount
   useEffect(() => {
-    if (currentSection === "candidates") {
+    if (currentSection === "candidates" || currentSection === "vote") {
       loadCandidates();
     }
   }, [currentSection]);
 
-  useEffect(() => {
-    if (currentSection === "vote") {
-      loadCandidates();
-    }
-  }, [currentSection]);
   // Handlers
   const handleGetVoterDetails = async (voterId) => {
     if (!voterId.trim()) {
@@ -377,7 +377,6 @@ const Voter = () => {
     try {
       setLoading(true);
       await apiCalls.updateVoter(updateData);
-      handleGetProfile();
       setUpdateMessage({
         type: "success",
         text: "Profile updated successfully! Changes will be reflected shortly.",
