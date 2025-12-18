@@ -177,11 +177,11 @@ const Voter = () => {
       getProfile();
     }
   }, [currentSection]);
-  useEffect(() => {
-    if (currentSection === "myProfile") {
-      getProfile();
-    }
-  }, [currentSection]);
+  // useEffect(() => {
+  //   if (currentSection === "myProfile") {
+  //     getProfile();
+  //   }
+  // }, [currentSection]);
   // Load candidates on mount
   useEffect(() => {
     if (currentSection === "candidates" || currentSection === "vote") {
@@ -381,6 +381,7 @@ const Voter = () => {
         type: "success",
         text: "Profile updated successfully! Changes will be reflected shortly.",
       });
+      getProfile();
       setTimeout(() => setUpdateMessage(null), 5000);
       setMessage(null);
     } catch (error) {
