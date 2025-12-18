@@ -155,6 +155,20 @@ const Voter = () => {
       });
       return await response;
     },
+    getProfile: async () => {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/getProfile/${user.id.trim()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return await response.json();
+    },
   };
 
   useEffect(() => {
@@ -271,6 +285,7 @@ const Voter = () => {
         type: "success",
         text: "Your vote has been successfully recorded! Thank you for participating.",
       });
+      handleGetProfile();
       setVoteForm({ id: "", candidateId: "", confirmCandidateId: "" });
       setTimeout(() => setVoteMessage(null), 7000);
       setMessage(null);
@@ -318,7 +333,8 @@ const Voter = () => {
     updateData.id = updateForm.id;
     if (updateForm.name.trim()) updateData.name = updateForm.name.trim();
     if (updateForm.email.trim()) updateData.email = updateForm.email.trim();
-    if (updateForm.phone.trim()) updateData.phone = updateForm.phone.trim();
+    if (updateForm.phone.trim())
+      updateData.phoneNumber = updateForm.phone.trim();
     if (updateForm.age && isNaN(updateForm.age.trim())) {
       setMessage({ type: "error", text: "Enter a valid number for age" });
       return;
@@ -355,6 +371,7 @@ const Voter = () => {
     try {
       setLoading(true);
       await apiCalls.updateVoter(updateData);
+      handleGetProfile();
       setUpdateMessage({
         type: "success",
         text: "Profile updated successfully! Changes will be reflected shortly.",
@@ -372,7 +389,22 @@ const Voter = () => {
       setLoading(false);
     }
   };
-
+  const handleGetProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await apiCalls.getProfile();
+      localStorage.setItem("user", response.user);
+      setUser(response.user);
+      setTimeout(() => setUpdateMessage(null), 5000);
+      setMessage(null);
+    } catch (error) {
+      setUpdateMessage({
+        type: "error",
+        text:
+          error?.response?.data || "Failed to load profile. Please try again.",
+      });
+    }
+  };
   const formatTime = (value) => {
     const d = new Date(value.replace(" ", "T"));
     const dd = String(d.getDate()).padStart(2, "0");

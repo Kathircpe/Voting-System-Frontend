@@ -548,6 +548,21 @@ const Admin = () => {
 
   // Voter handlers
   const handleGetAllVoters = async () => {
+    if (!currentPage.trim()) {
+      setMessage({ type: "error", text: "Please enter a number" });
+      return;
+    }
+    if (isNaN(currentPage.trim())) {
+      setMessage({ type: "error", text: "Please enter a valid number" });
+      return;
+    }
+    if (currentPage.trim() < 1) {
+      setMessage({
+        type: "error",
+        text: "Please enter a number greater than 0",
+      });
+      return;
+    }
     try {
       setLoading(true);
       const data = await apiCalls.getAllVoters(currentPage);
@@ -1408,13 +1423,12 @@ const Admin = () => {
                 <div className={styles.inputGroup}>
                   {/* <label className={styles.inputLabel}>Page</label> */}
                   <input
-                    type="number"
+                    type="text"
                     className={styles.inputField}
                     value={currentPage}
                     onChange={(e) =>
                       setCurrentPage(parseInt(e.target.value) || 1)
                     }
-                    min="1"
                   />
                 </div>
               </div>
