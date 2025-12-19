@@ -105,7 +105,7 @@ const Admin = () => {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
-          },
+          }
         }
       );
       return await response;
@@ -408,10 +408,10 @@ const Admin = () => {
 
     try {
       setLoading(true);
-      await apiCalls.deleteElection(electionForm.id.trim());
+      await apiCalls.deleteElection(deleteElectionId.trim());
       setMessage({
         type: "success",
-        text: `Election ${electionForm.id} deleted!`,
+        text: `Election ${deleteElectionId} deleted!`,
       });
       setDeleteElectionId("");
       setTimeout(() => setMessage(null), 5000);
@@ -419,7 +419,7 @@ const Admin = () => {
     } catch (error) {
       setMessage({
         type: "error",
-        text: error.response.data || "Failed to delete election",
+        text: error.response?.data || "Failed to delete election",
       });
     } finally {
       setLoading(false);
