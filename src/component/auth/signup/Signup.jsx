@@ -1,44 +1,44 @@
-import React, { useState } from 'react';
-import { authService } from '../AuthService';
-import styles from './Signup.module.css';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { authService } from "../AuthService";
+import styles from "./Signup.module.css";
+import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    age: '',
-    email: '',
-    phone: '',
-    address: '',
-    password: '',
-    confirmPassword: '',
-    role: ''
+    name: "",
+    age: "",
+    email: "",
+    phone: "",
+    address: "",
+    password: "",
+    confirmPassword: "",
+    role: "",
   });
 
   const [showPassword, setShowPassword] = useState({
     password: false,
-    confirmPassword: false
+    confirmPassword: false,
   });
 
   const [validation, setValidation] = useState({});
-  const [message, setMessage] = useState({ text: '', type: '' });
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [otpGenerated, setOtpGenerated] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [passwordStrength, setPasswordStrength] = useState('');
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [passwordStrength, setPasswordStrength] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (value !== 'voter') {
+    if (value !== "voter") {
       setFormData({
         ...formData,
-        [name]: value
+        [name]: value,
       });
     }
 
-    if (name === 'password') {
+    if (name === "password") {
       checkPasswordStrength(value);
     }
   };
@@ -46,13 +46,13 @@ const Signup = () => {
   const togglePassword = (field) => {
     setShowPassword({
       ...showPassword,
-      [field]: !showPassword[field]
+      [field]: !showPassword[field],
     });
   };
 
   const checkPasswordStrength = (password) => {
     if (!password) {
-      setPasswordStrength('');
+      setPasswordStrength("");
       return;
     }
 
@@ -62,48 +62,48 @@ const Signup = () => {
     if (/[0-9]/.test(password)) strength++;
     if (/[^a-zA-Z0-9]/.test(password)) strength++;
 
-    if (strength <= 2) setPasswordStrength('weak');
-    else if (strength === 3) setPasswordStrength('medium');
-    else setPasswordStrength('strong');
+    if (strength <= 2) setPasswordStrength("weak");
+    else if (strength === 3) setPasswordStrength("medium");
+    else setPasswordStrength("strong");
   };
 
   const validateField = (fieldName, value) => {
     const validationRules = {
       name: {
         test: (val) => val.length >= 3,
-        error: 'Name must be at least 3 characters',
-        success: 'Valid name'
+        error: "Name must be at least 3 characters",
+        success: "Valid name",
       },
       age: {
         test: (val) => val >= 18 && val <= 120,
-        error: 'You must be 18 or older to vote',
-        success: 'Valid age'
+        error: "You must be 18 or older to vote",
+        success: "Valid age",
       },
       email: {
         test: (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-        error: 'Please enter a valid email address',
-        success: 'Valid email'
+        error: "Please enter a valid email address",
+        success: "Valid email",
       },
       phone: {
         test: (val) => /^[0-9]{10}$/.test(val),
-        error: 'Phone number must be exactly 10 digits',
-        success: 'Valid phone number'
+        error: "Phone number must be exactly 10 digits",
+        success: "Valid phone number",
       },
       address: {
         test: (val) => val.length >= 10,
-        error: 'Address must be at least 10 characters',
-        success: 'Valid address'
+        error: "Address must be at least 10 characters",
+        success: "Valid address",
       },
       password: {
         test: (val) => val.length >= 8,
-        error: 'Password must be at least 8 characters',
-        success: 'Strong password'
+        error: "Password must be at least 8 characters",
+        success: "Strong password",
       },
       confirmPassword: {
         test: (val) => val === formData.password,
-        error: 'Passwords do not match',
-        success: 'Passwords match'
-      }
+        error: "Passwords do not match",
+        success: "Passwords match",
+      },
     };
 
     const rule = validationRules[fieldName];
@@ -112,21 +112,21 @@ const Signup = () => {
     if (value && rule.test(value)) {
       setValidation({
         ...validation,
-        [fieldName]: { valid: true, message: rule.success }
+        [fieldName]: { valid: true, message: rule.success },
       });
     } else if (value) {
       setValidation({
         ...validation,
-        [fieldName]: { valid: false, message: rule.error }
+        [fieldName]: { valid: false, message: rule.error },
       });
     }
   };
 
   const validateAllFields = () => {
-    const fields = ['name', 'age', 'email', 'phone', 'address', 'password'];
+    const fields = ["name", "age", "email", "phone", "address", "password"];
     let isValid = true;
 
-    fields.forEach(field => {
+    fields.forEach((field) => {
       if (!formData[field] || validation[field]?.valid === false) {
         isValid = false;
       }
@@ -141,7 +141,10 @@ const Signup = () => {
 
   const handleGenerateOtp = async () => {
     if (!validateAllFields()) {
-      setMessage({ text: 'Please fill all fields correctly before generating OTP', type: 'error' });
+      setMessage({
+        text: "Please fill all fields correctly before generating OTP",
+        type: "error",
+      });
       return;
     }
     setIsLoading(true);
@@ -152,21 +155,20 @@ const Signup = () => {
         age: formData.age,
         email: formData.email,
         phoneNumber: formData.phone,
-        voterAddress: formData.address,
-        password: formData.password
+        privateKey: formData.address,
+        password: formData.password,
       };
 
       await authService.signUp(credentials);
 
       setShowOtp(true);
       setOtpGenerated(true);
-      setMessage({ text: 'successfully otp generated', type: 'success' });
-
+      setMessage({ text: "successfully otp generated", type: "success" });
     } catch (error) {
-      console.log('Full error:', error.response);
+      console.log("Full error:", error.response);
       setMessage({
-        text: error.response.data || error.message || 'Signup failed',
-        type: 'error'
+        text: error.response?.data || error.message || "Signup failed",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -186,19 +188,20 @@ const Signup = () => {
   };
 
   const handleOtpKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
       document.getElementById(`otp${index}`)?.focus();
     }
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const otpValue = otp.join('');
+    const otpValue = otp.join("");
 
     if (otpValue.length !== 6) {
-      setMessage({ text: 'Please enter the complete 6-digit OTP', type: 'error' });
+      setMessage({
+        text: "Please enter the complete 6-digit OTP",
+        type: "error",
+      });
       return;
     }
 
@@ -207,30 +210,32 @@ const Signup = () => {
     try {
       const credentials = {
         email: formData.email,
-        otp: otpValue
+        otp: otpValue,
       };
 
       await authService.verifyAccount(credentials);
 
-      setMessage({ text: 'Account verified successfully! Redirecting...', type: 'success' });
+      setMessage({
+        text: "Account verified successfully! Redirecting...",
+        type: "success",
+      });
 
       setTimeout(() => {
-        navigate('/login');
+        navigate("/login");
       }, 10);
     } catch (error) {
       setMessage({
-        text: error.response.data || 'Verification failed',
-        type: 'error'
+        text: error.response.data || "Verification failed",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
     }
-
   };
 
   const hideMessage = () => {
-    if (message.type === 'error') {
-      setMessage({ text: '', type: '' });
+    if (message.type === "error") {
+      setMessage({ text: "", type: "" });
     }
   };
 
@@ -243,20 +248,30 @@ const Signup = () => {
           <p>Sign up to access your voting portal.</p>
           <p>Your data is securely stored and it</p>
           <p>won't be compromised at any time.</p>
-
         </div>
 
         {message.text && (
-          <div className={`${styles.message} ${styles[message.type]} ${styles.show}`}>
+          <div
+            className={`${styles.message} ${styles[message.type]} ${
+              styles.show
+            }`}
+          >
             {message.text}
           </div>
         )}
 
         <form className={styles.loginForm} onSubmit={handleSubmit}>
-
           {/* Name Input */}
           <div className={styles.inputGroup}>
-            <div className={`${styles.inputWrapper} ${validation.name ? (validation.name.valid ? styles.valid : styles.invalid) : ''}`}>
+            <div
+              className={`${styles.inputWrapper} ${
+                validation.name
+                  ? validation.name.valid
+                    ? styles.valid
+                    : styles.invalid
+                  : ""
+              }`}
+            >
               <span className={styles.inputIcon}>👤</span>
               <input
                 type="text"
@@ -265,7 +280,7 @@ const Signup = () => {
                 placeholder=" "
                 value={formData.name}
                 onChange={handleInputChange}
-                onBlur={(e) => validateField('name', e.target.value)}
+                onBlur={(e) => validateField("name", e.target.value)}
                 onFocus={hideMessage}
                 required
                 autoComplete="name"
@@ -274,7 +289,11 @@ const Signup = () => {
               <label htmlFor="name">Full Name</label>
             </div>
             {validation.name && (
-              <div className={`${styles.validationMsg} ${validation.name.valid ? styles.success : styles.error} ${styles.show}`}>
+              <div
+                className={`${styles.validationMsg} ${
+                  validation.name.valid ? styles.success : styles.error
+                } ${styles.show}`}
+              >
                 {validation.name.message}
               </div>
             )}
@@ -282,7 +301,15 @@ const Signup = () => {
 
           {/* Age Input */}
           <div className={styles.inputGroup}>
-            <div className={`${styles.inputWrapper} ${validation.age ? (validation.age.valid ? styles.valid : styles.invalid) : ''}`}>
+            <div
+              className={`${styles.inputWrapper} ${
+                validation.age
+                  ? validation.age.valid
+                    ? styles.valid
+                    : styles.invalid
+                  : ""
+              }`}
+            >
               <span className={styles.inputIcon}>🎂</span>
               <input
                 type="number"
@@ -291,7 +318,7 @@ const Signup = () => {
                 placeholder=" "
                 value={formData.age}
                 onChange={handleInputChange}
-                onBlur={(e) => validateField('age', e.target.value)}
+                onBlur={(e) => validateField("age", e.target.value)}
                 onFocus={hideMessage}
                 required
                 min="18"
@@ -300,7 +327,11 @@ const Signup = () => {
               <label htmlFor="age">Age (18+)</label>
             </div>
             {validation.age && (
-              <div className={`${styles.validationMsg} ${validation.age.valid ? styles.success : styles.error} ${styles.show}`}>
+              <div
+                className={`${styles.validationMsg} ${
+                  validation.age.valid ? styles.success : styles.error
+                } ${styles.show}`}
+              >
                 {validation.age.message}
               </div>
             )}
@@ -308,7 +339,15 @@ const Signup = () => {
 
           {/* Email Input */}
           <div className={styles.inputGroup}>
-            <div className={`${styles.inputWrapper} ${validation.email ? (validation.email.valid ? styles.valid : styles.invalid) : ''}`}>
+            <div
+              className={`${styles.inputWrapper} ${
+                validation.email
+                  ? validation.email.valid
+                    ? styles.valid
+                    : styles.invalid
+                  : ""
+              }`}
+            >
               <span className={styles.inputIcon}>📧</span>
               <input
                 type="email"
@@ -317,7 +356,7 @@ const Signup = () => {
                 placeholder=" "
                 value={formData.email}
                 onChange={handleInputChange}
-                onBlur={(e) => validateField('email', e.target.value)}
+                onBlur={(e) => validateField("email", e.target.value)}
                 onFocus={hideMessage}
                 required
                 autoComplete="email"
@@ -325,7 +364,11 @@ const Signup = () => {
               <label htmlFor="email">Email Address</label>
             </div>
             {validation.email && (
-              <div className={`${styles.validationMsg} ${validation.email.valid ? styles.success : styles.error} ${styles.show}`}>
+              <div
+                className={`${styles.validationMsg} ${
+                  validation.email.valid ? styles.success : styles.error
+                } ${styles.show}`}
+              >
                 {validation.email.message}
               </div>
             )}
@@ -333,7 +376,15 @@ const Signup = () => {
 
           {/* Phone Input */}
           <div className={styles.inputGroup}>
-            <div className={`${styles.inputWrapper} ${validation.phone ? (validation.phone.valid ? styles.valid : styles.invalid) : ''}`}>
+            <div
+              className={`${styles.inputWrapper} ${
+                validation.phone
+                  ? validation.phone.valid
+                    ? styles.valid
+                    : styles.invalid
+                  : ""
+              }`}
+            >
               <span className={styles.inputIcon}>📱</span>
               <input
                 type="tel"
@@ -342,7 +393,7 @@ const Signup = () => {
                 placeholder=" "
                 value={formData.phone}
                 onChange={handleInputChange}
-                onBlur={(e) => validateField('phone', e.target.value)}
+                onBlur={(e) => validateField("phone", e.target.value)}
                 onFocus={hideMessage}
                 required
                 pattern="[0-9]{10}"
@@ -351,7 +402,11 @@ const Signup = () => {
               <label htmlFor="phone">Phone Number (10 digits)</label>
             </div>
             {validation.phone && (
-              <div className={`${styles.validationMsg} ${validation.phone.valid ? styles.success : styles.error} ${styles.show}`}>
+              <div
+                className={`${styles.validationMsg} ${
+                  validation.phone.valid ? styles.success : styles.error
+                } ${styles.show}`}
+              >
                 {validation.phone.message}
               </div>
             )}
@@ -359,7 +414,15 @@ const Signup = () => {
 
           {/* Address Input */}
           <div className={styles.inputGroup}>
-            <div className={`${styles.inputWrapper} ${validation.address ? (validation.address.valid ? styles.valid : styles.invalid) : ''}`}>
+            <div
+              className={`${styles.inputWrapper} ${
+                validation.address
+                  ? validation.address.valid
+                    ? styles.valid
+                    : styles.invalid
+                  : ""
+              }`}
+            >
               <span className={styles.inputIcon}>📍</span>
               <textarea
                 id="address"
@@ -367,15 +430,19 @@ const Signup = () => {
                 placeholder=" "
                 value={formData.address}
                 onChange={handleInputChange}
-                onBlur={(e) => validateField('address', e.target.value)}
+                onBlur={(e) => validateField("address", e.target.value)}
                 onFocus={hideMessage}
                 required
                 minLength="10"
               />
-              <label htmlFor="address">Etheruem Wallet Address</label>
+              <label htmlFor="address">Crypto wallet private key</label>
             </div>
             {validation.address && (
-              <div className={`${styles.validationMsg} ${validation.address.valid ? styles.success : styles.error} ${styles.show}`}>
+              <div
+                className={`${styles.validationMsg} ${
+                  validation.address.valid ? styles.success : styles.error
+                } ${styles.show}`}
+              >
                 {validation.address.message}
               </div>
             )}
@@ -383,16 +450,24 @@ const Signup = () => {
 
           {/* Password Input */}
           <div className={styles.inputGroup}>
-            <div className={`${styles.inputWrapper} ${validation.password ? (validation.password.valid ? styles.valid : styles.invalid) : ''}`}>
+            <div
+              className={`${styles.inputWrapper} ${
+                validation.password
+                  ? validation.password.valid
+                    ? styles.valid
+                    : styles.invalid
+                  : ""
+              }`}
+            >
               <span className={styles.inputIcon}>🔒</span>
               <input
-                type={showPassword.password ? 'text' : 'password'}
+                type={showPassword.password ? "text" : "password"}
                 id="password"
                 name="password"
                 placeholder=" "
                 value={formData.password}
                 onChange={handleInputChange}
-                onBlur={(e) => validateField('password', e.target.value)}
+                onBlur={(e) => validateField("password", e.target.value)}
                 onFocus={hideMessage}
                 required
                 minLength="8"
@@ -401,18 +476,24 @@ const Signup = () => {
               <button
                 type="button"
                 className={styles.passwordToggle}
-                onClick={() => togglePassword('password')}
+                onClick={() => togglePassword("password")}
               >
-                <span>{showPassword.password ? '🙈' : '👁️'}</span>
+                <span>{showPassword.password ? "🙈" : "👁️"}</span>
               </button>
             </div>
             {passwordStrength && (
               <div className={`${styles.passwordStrength} ${styles.show}`}>
-                <div className={`${styles.passwordStrengthBar} ${styles[passwordStrength]}`}></div>
+                <div
+                  className={`${styles.passwordStrengthBar} ${styles[passwordStrength]}`}
+                ></div>
               </div>
             )}
             {validation.password && (
-              <div className={`${styles.validationMsg} ${validation.password.valid ? styles.success : styles.error} ${styles.show}`}>
+              <div
+                className={`${styles.validationMsg} ${
+                  validation.password.valid ? styles.success : styles.error
+                } ${styles.show}`}
+              >
                 {validation.password.message}
               </div>
             )}
@@ -420,16 +501,24 @@ const Signup = () => {
 
           {/* Confirm Password Input */}
           <div className={styles.inputGroup}>
-            <div className={`${styles.inputWrapper} ${validation.confirmPassword ? (validation.confirmPassword.valid ? styles.valid : styles.invalid) : ''}`}>
+            <div
+              className={`${styles.inputWrapper} ${
+                validation.confirmPassword
+                  ? validation.confirmPassword.valid
+                    ? styles.valid
+                    : styles.invalid
+                  : ""
+              }`}
+            >
               <span className={styles.inputIcon}>🔐</span>
               <input
-                type={showPassword.confirmPassword ? 'text' : 'password'}
+                type={showPassword.confirmPassword ? "text" : "password"}
                 id="confirmPassword"
                 name="confirmPassword"
                 placeholder=" "
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                onBlur={(e) => validateField('confirmPassword', e.target.value)}
+                onBlur={(e) => validateField("confirmPassword", e.target.value)}
                 onFocus={hideMessage}
                 required
                 minLength="8"
@@ -438,13 +527,19 @@ const Signup = () => {
               <button
                 type="button"
                 className={styles.passwordToggle}
-                onClick={() => togglePassword('confirmPassword')}
+                onClick={() => togglePassword("confirmPassword")}
               >
-                <span>{showPassword.confirmPassword ? '🙈' : '👁️'}</span>
+                <span>{showPassword.confirmPassword ? "🙈" : "👁️"}</span>
               </button>
             </div>
             {validation.confirmPassword && (
-              <div className={`${styles.validationMsg} ${validation.confirmPassword.valid ? styles.success : styles.error} ${styles.show}`}>
+              <div
+                className={`${styles.validationMsg} ${
+                  validation.confirmPassword.valid
+                    ? styles.success
+                    : styles.error
+                } ${styles.show}`}
+              >
                 {validation.confirmPassword.message}
               </div>
             )}
@@ -471,7 +566,9 @@ const Signup = () => {
           {/* Generate OTP Button */}
           <button
             type="button"
-            className={`${styles.btn} ${styles.btnOutline} ${isLoading ? styles.loading : ''}`}
+            className={`${styles.btn} ${styles.btnOutline} ${
+              isLoading ? styles.loading : ""
+            }`}
             onClick={handleGenerateOtp}
             disabled={isLoading}
           >
@@ -485,7 +582,7 @@ const Signup = () => {
                 <input
                   key={index}
                   type="text"
-                  className={`${styles.otpInput} ${digit ? styles.filled : ''}`}
+                  className={`${styles.otpInput} ${digit ? styles.filled : ""}`}
                   maxLength="1"
                   id={`otp${index + 1}`}
                   value={digit}
@@ -496,16 +593,19 @@ const Signup = () => {
             </div>
           )}
           {otpGenerated && (
-            <div style={{ textAlign: 'center' }}>
-              <span style={{ opacity: isLoading ? 0 : 1 }}>check spam mails too!</span>
+            <div style={{ textAlign: "center" }}>
+              <span style={{ opacity: isLoading ? 0 : 1 }}>
+                check spam mails too!
+              </span>
             </div>
-
           )}
           {/* Buttons */}
           <div className={styles.btnGroup}>
             <button
               type="submit"
-              className={`${styles.btn} ${styles.btnPrimary} ${isLoading ? styles.loading : ''}`}
+              className={`${styles.btn} ${styles.btnPrimary} ${
+                isLoading ? styles.loading : ""
+              }`}
               disabled={isLoading}
             >
               <span style={{ opacity: isLoading ? 0 : 1 }}>Sign Up</span>
@@ -514,14 +614,16 @@ const Signup = () => {
             <button
               type="button"
               className={`${styles.btn} ${styles.btnSecondary}`}
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
             >
               <span>Log In</span>
             </button>
           </div>
 
           <div className={styles.formLinks}>
-            <Link to="/" className={styles.formLink}>Back to Home</Link>
+            <Link to="/" className={styles.formLink}>
+              Back to Home
+            </Link>
           </div>
         </form>
 
@@ -530,7 +632,9 @@ const Signup = () => {
         </div>
 
         <div className={styles.loginFooter}>
-          <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
+          <p>
+            By continuing, you agree to our Terms of Service and Privacy Policy
+          </p>
           <Link to="/help">Need Help?</Link>
         </div>
       </div>

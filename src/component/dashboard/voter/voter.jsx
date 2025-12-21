@@ -69,7 +69,7 @@ const Voter = () => {
     email: "",
     phone: "",
     age: "",
-    address: "",
+    privateKey: "",
   });
   const [updateMessage, setUpdateMessage] = useState(null);
 
@@ -345,8 +345,8 @@ const Voter = () => {
       return;
     }
     if (updateForm.age) updateData.age = parseInt(updateForm.age);
-    if (updateForm.address.trim())
-      updateData.address = updateForm.address.trim();
+    if (updateForm.privateKey.trim())
+      updateData.privateKey = updateForm.privateKey.trim();
 
     if (Object.keys(updateData).length === 1) {
       // only id present
@@ -713,17 +713,17 @@ const Voter = () => {
                 <span className={styles.infoValue}>{user.age}</span>
               </div>
               <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Has Voted</span>
+                <span className={styles.infoLabel}>Already voted</span>
                 <span className={styles.infoValue}>
                   {user.hasVoted ? "Yes" : "No"}
                 </span>
               </div>
               <div className={styles.infoRow}>
                 <span className={styles.infoLabel}>
-                  Ethereum wallet Address
+                  Crypto wallet private key
                 </span>
                 <span className={styles.infoValue} style={{ fontSize: "12px" }}>
-                  {user.voterAddress}
+                  {user.privateKey}
                 </span>
               </div>
               <div className={styles.infoRow}>
@@ -1252,8 +1252,8 @@ const Voter = () => {
               <div className={`${styles.alert} ${styles.alertWarning}`}>
                 <span>⚠️</span>
                 <span>
-                  Please ensure all information is accurate. Changes may require
-                  re-verification.
+                  Please ensure all information is accurate and fill the only
+                  fields which requires change.
                 </span>
               </div>
 
@@ -1325,10 +1325,10 @@ const Voter = () => {
                 {/* <label className={styles.label}>Voter Address </label> */}
                 <textarea
                   className={`${styles.inputField} ${styles.textArea}`}
-                  placeholder="Enter your Ethereum wallet address"
-                  value={updateForm.address}
+                  placeholder="Enter your Crypto wallet private key"
+                  value={updateForm.privateKey}
                   onChange={(e) =>
-                    setUpdateForm({ ...updateForm, address: e.target.value })
+                    setUpdateForm({ ...updateForm, privateKey: e.target.value })
                   }
                 />
 
