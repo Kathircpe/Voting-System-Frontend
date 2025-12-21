@@ -1349,7 +1349,7 @@ const Voter = () => {
                         email: "",
                         phone: "",
                         age: "",
-                        address: "",
+                        privateKey: "",
                       })
                     }
                   >
