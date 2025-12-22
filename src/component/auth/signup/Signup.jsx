@@ -423,7 +423,7 @@ const Signup = () => {
                   : ""
               }`}
             >
-              <span className={styles.inputIcon}>📍</span>
+              <span className={styles.inputIcon}>🔑</span>
               <textarea
                 id="address"
                 name="address"

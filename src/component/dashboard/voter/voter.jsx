@@ -155,6 +155,7 @@ const Voter = () => {
       });
       return await response;
     },
+
     getProfile: async () => {
       const token = localStorage.getItem("token");
       const response = await fetch(`${API_BASE_URL}/getProfile/${user.id}`, {
@@ -285,10 +286,12 @@ const Voter = () => {
 
     try {
       setLoading(true);
-      await apiCalls.castVote(data);
+      const response = await apiCalls.castVote(data);
       setVoteMessage({
         type: "success",
-        text: "Your vote has been successfully recorded! Thank you for participating.",
+        text:
+          response.text() ||
+          "Your vote has been successfully recorded! Thank you for participating.",
       });
       handleGetProfile();
       setVoteForm({ id: "", candidateId: "", confirmCandidateId: "" });
@@ -1119,7 +1122,7 @@ const Voter = () => {
                     candidateId: r.id,
                     name: r.name,
                     partyName: r.partyName,
-                    votes: r.votes,
+                    votes: Number(r.votes) || 0,
                   }));
 
                   const totalVotes = parsed.reduce(
